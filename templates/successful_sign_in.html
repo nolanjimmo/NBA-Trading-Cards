@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+    <title>Successful Sign In</title>
+</head>
+    <body>
+        <h1>Welcome {u_name}! This is your dashboard</h1>
+        <h1> Make a selection for what you want to do</h1>
+        <form action="/selection" method="POST">
+            <input type="radio" id="display" name="selection" value="display">
+            <label for="display">Display</label><br>
+            <input type="radio" id="buy" name="selection" value="buy">
+            <label for="buy">Buy</label><br>
+            <input type="radio" id="trade" name="selection" value="trade">
+            <label for="trade">Trade</label><br>
+            <input type="submit">
+        </form>
+        <br>
+        <button><a href="{{ url_for('about') }}">About</a></button>
+    </body>
+</html>
