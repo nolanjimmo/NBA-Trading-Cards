@@ -23,17 +23,22 @@ def about():
 @app.route("/sign_in", methods=['POST'])
 def sign_in():
     global username
+    valid_user = None
     username = request.form['username']
     #here, we query the database for the username
     #if the username is found, we load the users data in to a class to then display
         #return render_template(the "successful sign in" page)
     #else, we tell the user we could not find their username
 
-    #just for now, I'll make this if/else clause:
+    #just for now, I'll make this if/else clause
+    #If username is valid, go to next page
     if username == "user1":
-        return render_template("successful_sign_in.html", u_name=username)
+        return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+    #if username is not valid, stay on login in page and show the user their username
+    #is not valid
     else:
-        return render_template("main_page.html", u_name=username)
+        valid_user = False
+        return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 @app.route("/selection", methods=['POST'])
 def decision():

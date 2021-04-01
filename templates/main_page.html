@@ -6,11 +6,17 @@
     <body>
         <h1> This is the home page!</h1>
         <h1> Sign in to access your card trading system!</h1>
+        {%if valid_user == False%}
+            <p>Please try again</p>
+        {%endif%}
+        <p>Username</p>
         <form action="/sign_in" method="POST">
             <input type="text" name="username"></input>
             <input type="submit"></input>
         </form>
-        <!-- <p>{{u_name}}</p>  -->
+        {%if valid_user == False%}
+            <p>Username: {{u_name}} is not valid</p>
+        {%endif%}
         <button><a href="{{ url_for('about') }}">About</a></button>
     </body>
 </html>
