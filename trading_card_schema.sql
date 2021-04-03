@@ -22,7 +22,7 @@ create table if not exists Players (
 
 create table if not exists Users (
     id integer primary key,
-    name text not null,
+    name text not null unique,
     cards text,
     trades text
 );
