@@ -9,14 +9,16 @@ from query_engine import *
 db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
 
+if os.path.exists(db_filename):
+        os.remove(db_filename)
 load_database(db_filename, schema_filename)
 ###Test data for the database
 load_test_data(db_filename)
-qe = QueryEngine(db_filename)
 
 app = Flask(__name__)
 
 username = ""
+curr_user = None
 
 
 @app.route("/")
@@ -31,30 +33,31 @@ def about():
 
 @app.route("/sign_in", methods=['POST'])
 def sign_in():
+    qe = QueryEngine(db_filename)
     global username
+    global curr_user
     valid_user = None
     username = request.form['username']
     #here, we query the database for the username
-    #if the username is found, we load the users data in to a class to then display
-        #return render_template(the "successful sign in" page)
-    #else, we tell the user we could not find their username
-
-    #just for now, I'll make this if/else clause
-    #If username is valid, go to next page
-    if username == "user1":
+    try:
+        curr_user = qe.get_user_from_username(username)
         return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
-    #if username is not valid, stay on login in page and show the user their username
-    #is not valid
-    else:
+    except:
         valid_user = False
         return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 @app.route("/selection", methods=['POST'])
 def decision():
+    qe = QueryEngine(db_filename)
     choice = request.form['selection']
     if choice == "display":
-        #display the users cards
-        return render_template("display_cards.html")
+        player_list = []
+        #Create player classes for each of the player cards that the user has
+        #Store them in a list, then pass that list to the render_template()
+        for card in curr_user.cards:
+            player_list.append(qe.get_player(card))
+        #display the users cards by passing list to display_cards.html
+        return render_template("display_cards.html", p_list=player_list)
     elif choice == "buy":
         #allow the user to look at more cards to buy
          return render_template("buy_cards.html")
