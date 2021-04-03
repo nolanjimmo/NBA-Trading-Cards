@@ -1,82 +1,157 @@
+import os
 import sqlite3
 import csv
-from typing import List
+from dataclasses import dataclass
+from typing import Tuple
+
+db_filename = "trading_card_data.db"
+schema_filename = "trading_card_schema.sql"
 
 
-def load_database(connection_str: str) -> None:
-    conn: sqlite3.Connection = sqlite3.connect(connection_str)
+def parse_ids(ids: str) -> Tuple[int]:
+    return tuple([int(id) for id in ids.split(",")])
 
-    try:
-        conn.execute("drop table Players")
-        conn.execute("drop table Users")
-        conn.execute("drop table Trades")
-    except sqlite3.OperationalError as err:
-        print("table does not exist", err)
 
-    conn.execute("""
-    create table Players (
-    id integer primary key,
-    name text not null,
-    team text not null,
-    pos text not null,
-    age real not null,
-    gp integer not null,
-    mpg real not null,
-    fta integer not null,
-    ft_pct real not null,
-    two_pa integer not null,
-    two_p_pct real not null,
-    three_pa integer not null,
-    three_p_pct real not null,
-    shooting_pct real not null,
-    ppointspg real not null,
-    reboundspg real not null,
-    assistspg real not null,
-    stealspg real not null,
-    blockspg real not null)
-    """)
+@dataclass
+class Player:
+    id: int
+    name: str
+    team: str
+    pos: str
+    age: int
+    gp: int
+    mpg: int
+    fta: int
+    ft_pct: int
+    two_pa: int
+    two_p_pct: int
+    three_pa: int
+    three_p_pct: int
+    shooting_pct: int
+    ppointspg: int
+    reboundspg: int
+    assistspg: int
+    stealspg: int
+    blockspg: int
 
-    conn.execute("""
-    create table Users (
-    id integer primary key,
-    name text not null,
-    cards text not null,
-    trades text not null)
-    """)
 
-    conn.execute("""
-    create table Trades (
-    id integer primary key,
-    user1_id integer not null references Users,
-    user1_players text not null,
-    user2_id integer not null references Users,
-    user2_players text not null)
-    """)
+def create_player(
+        player_data: Tuple[
+            int, str, str, str, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int
+        ]) -> Player:
+    return Player(
+        player_data[0],
+        player_data[1],
+        player_data[2],
+        player_data[3],
+        player_data[4],
+        player_data[5],
+        player_data[6],
+        player_data[7],
+        player_data[8],
+        player_data[9],
+        player_data[10],
+        player_data[11],
+        player_data[12],
+        player_data[13],
+        player_data[14],
+        player_data[15],
+        player_data[16],
+        player_data[17],
+        player_data[18])
 
-    with open("NBAdata.csv", 'r') as players_file:
-        players = csv.DictReader(players_file)
-        for player in players:
-            player_data: List[str] = []
-            for key, value in player.items():
-                if key == "FULL NAME" or \
-                        key == "TEAM" or \
-                        key == "POS":
-                    value = value.replace("'", "''")
-                    player_data.append(f'\'{value}\'')
-                else:
-                    player_data.append(value)
-            conn.execute(f"""
-            insert into Players (
-                name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, 
-                shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
-            values ({", ".join(player_data)})
-            """)
 
-    conn.commit()
-    conn.close()
+@dataclass
+class Trade:
+    id: int
+    user1_id: int
+    user1_players: Tuple[int]
+    user2_id: int
+    user2_players: Tuple[int]
+
+
+def create_trade(trade_data: Tuple[int, int, str, int, str]) -> Trade:
+    return Trade(trade_data[0], trade_data[1], parse_ids(trade_data[2]), trade_data[3], parse_ids(trade_data[4]))
+
+
+@dataclass
+class User:
+    id: int
+    name: str
+    cards: Tuple[int]
+    trades: Tuple[int]
+
+
+def create_user(user_data: Tuple[int, str, str, str]) -> User:
+    return User(user_data[0], user_data[1], parse_ids(user_data[2]), parse_ids(user_data[3]))
+
+
+class QueryEngine:
+    conn: sqlite3.Connection
+
+    def __init__(self, db_loc: str):
+        self.conn = sqlite3.connect(db_loc)
+
+    def get_player(self, player_id: int) -> Player:
+        output = self.conn.execute("select * from Players where id = ?", (player_id,)).fetchone()
+        if output is None:
+            raise Exception("no player with id", player_id)
+        return create_player(output)
+
+    def get_trade(self, trade_id: int) -> Trade:
+        output = self.conn.execute("select * from Trades where id = ?", (trade_id,)).fetchone()
+        if output is None:
+            raise Exception("no trade with id", trade_id)
+        return create_trade(output)
+
+    def get_user(self, user_id: int) -> User:
+        output = self.conn.execute("select * from Users where id = ?", (user_id,)).fetchone()
+        if output is None:
+            raise Exception("no user with id", user_id)
+        return create_user(output)
+
+    # TODO: Write functions to add users and trades
+
+
+def load_database(db_loc: str, schema_loc: str) -> None:
+    conn: sqlite3.Connection
+    db_exists = os.path.exists(db_loc)
+    with sqlite3.connect(db_loc) as conn:
+        if not db_exists:
+            with open(schema_loc, 'rt') as schema_file:
+                schema = schema_file.read()
+            conn.executescript(schema)
+
+            with open("NBAdata.csv", 'r') as players_file:
+                players = csv.DictReader(players_file)
+
+                sql = """insert into Players (name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
+                values (:NAME, :TEAM, :POS, :AGE, :GP, :MPG, :FTA, :FTpct, :2PA, :2Ppct, :3PA, :3Ppct, :SHOOTINGpct, :PPOINTSPG, :REBOUNDSPG, :ASSISTSPG, :STEALSPG, :BLOCKSPG)
+                """
+
+                cursor = conn.cursor()
+                cursor.executemany(sql, players)
+
+        conn.commit()
+
+
+def load_test_data(db_loc: str) -> None:
+    conn: sqlite3.Connection
+
+    with sqlite3.connect(db_loc) as conn:
+        # TODO: Create csv files with test data for Users and Trades to make this easier and more robust
+        conn.execute("insert into Users (name, cards, trades) values ('chuck', '1,2,3', '1'), ('nolan', '2', '1')")
+        conn.execute("insert into Trades (user1_id, user1_players, user2_id, user2_players) values (1, '1', 2, '2')")
+        conn.commit()
 
 
 if __name__ == "__main__":
-    load_database("trading_card_data.db")
-    conn = sqlite3.connect("trading_card_data.db")
-    print(conn.execute("select * from Players limit 5").fetchall())
+    os.remove(db_filename)
+    load_database(db_filename, schema_filename)
+    load_test_data(db_filename)
+    qe = QueryEngine(db_filename)
+    user1 = qe.get_user(1)
+    user2 = qe.get_user(2)
+    print(user1, user2)
+    print(qe.get_player(55))
+    print(qe.get_trade(1))
