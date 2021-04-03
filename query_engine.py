@@ -104,10 +104,16 @@ class QueryEngine:
             raise Exception("no trade with id", trade_id)
         return create_trade(output)
 
-    def get_user(self, user_id: int) -> User:
+    def get_user_from_id(self, user_id: int) -> User:
         output = self.conn.execute("select * from Users where id = ?", (user_id,)).fetchone()
         if output is None:
             raise Exception("no user with id", user_id)
+        return create_user(output)
+
+    def get_user_from_username(self, username: str) -> User:
+        output = self.conn.execute("select * from Users where name = ?", (username,)).fetchone()
+        if output is None:
+            raise Exception("no user with username", username)
         return create_user(output)
 
     # TODO: Write functions to add users and trades
@@ -151,8 +157,8 @@ if __name__ == "__main__":
     load_database(db_filename, schema_filename)
     load_test_data(db_filename)
     qe = QueryEngine(db_filename)
-    user1 = qe.get_user(1)
-    user2 = qe.get_user(2)
+    user1 = qe.get_user_from_id(1)
+    user2 = qe.get_user_from_username('chuck')
     print(user1, user2)
     print(qe.get_player(55))
     print(qe.get_trade(1))
