@@ -9,10 +9,6 @@ db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
 
 
-def parse_ids(ids: str) -> Tuple[int]:
-    return tuple([int(id) for id in ids.split(",")])
-
-
 def json_list_adapter(l: List) -> bytes:
     return json.dumps(l).encode("utf-8")
 
@@ -127,7 +123,31 @@ class QueryEngine:
             raise Exception("no user with username", username)
         return create_user(output)
 
+    def get_user_players(self, user_id: int) -> Tuple[Player]:
+        u: User = self.get_user_from_id(user_id)
+        user_cards: List[Player] = []
+        for player_id in u.cards:
+            user_cards.append(self.get_player_from_id(player_id))
+
+        return tuple(user_cards)
+
+    def get_user_trades(self, user_id: int) -> Tuple[Trade]:
+        u: User = self.get_user_from_id(user_id)
+        user_trades: List[Trade] = []
+        for trade_id in u.trades:
+            user_trades.append(self.get_trade_from_id(trade_id))
+
+        return tuple(user_trades)
+
     # TODO: Write functions to add users and trades
+    def add_user(self, username: str, cards: List[int], trades: List[int]) -> None:
+        try:
+            self.conn.execute("insert into Users (name, cards, trades) values (?, ?, ?)", (username, cards, trades))
+        except sqlite3.IntegrityError as err:
+            print("ERROR:", err)
+            self.conn.rollback()
+        else:
+            self.conn.commit()
 
 
 def load_database(db_loc: str, schema_loc: str) -> None:
@@ -174,6 +194,5 @@ if __name__ == "__main__":
     qe = QueryEngine(db_filename)
     user1 = qe.get_user_from_id(1)
     user2 = qe.get_user_from_username('chuck')
-    print(user1, user2)
-    print(qe.get_player_from_id(55))
-    print(qe.get_trade_from_id(1))
+    qe.add_user("dean", [5, 56], [])
+    print(qe.get_user_players(3))
