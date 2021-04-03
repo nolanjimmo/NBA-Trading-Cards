@@ -9,10 +9,6 @@ db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
 
 
-def parse_ids(ids: str) -> Tuple[int]:
-    return tuple([int(id) for id in ids.split(",")])
-
-
 def json_list_adapter(l: List) -> bytes:
     return json.dumps(l).encode("utf-8")
 
@@ -22,7 +18,7 @@ def json_list_converter(data: bytes) -> List[int]:
 
 
 @dataclass
-class Player:
+class Card:
     id: int
     name: str
     team: str
@@ -44,39 +40,39 @@ class Player:
     blockspg: int
 
 
-def create_player(
-        player_data: Tuple[
+def create_card(
+        card_data: Tuple[
             int, str, str, str, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int
-        ]) -> Player:
-    return Player(
-        player_data[0],
-        player_data[1],
-        player_data[2],
-        player_data[3],
-        player_data[4],
-        player_data[5],
-        player_data[6],
-        player_data[7],
-        player_data[8],
-        player_data[9],
-        player_data[10],
-        player_data[11],
-        player_data[12],
-        player_data[13],
-        player_data[14],
-        player_data[15],
-        player_data[16],
-        player_data[17],
-        player_data[18])
+        ]) -> Card:
+    return Card(
+        card_data[0],
+        card_data[1],
+        card_data[2],
+        card_data[3],
+        card_data[4],
+        card_data[5],
+        card_data[6],
+        card_data[7],
+        card_data[8],
+        card_data[9],
+        card_data[10],
+        card_data[11],
+        card_data[12],
+        card_data[13],
+        card_data[14],
+        card_data[15],
+        card_data[16],
+        card_data[17],
+        card_data[18])
 
 
 @dataclass
 class Trade:
     id: int
     user1_id: int
-    user1_players: Tuple[int]
+    user1_cards: Tuple[int]
     user2_id: int
-    user2_players: Tuple[int]
+    user2_cards: Tuple[int]
 
 
 def create_trade(trade_data: Tuple[int, int, List[int], int, List[int]]) -> Trade:
@@ -103,11 +99,11 @@ class QueryEngine:
         sqlite3.register_adapter(list, json_list_adapter)
         sqlite3.register_converter("json", json_list_converter)
 
-    def get_player_from_id(self, player_id: int) -> Player:
-        output = self.conn.execute("select * from Players where id = ?", (player_id,)).fetchone()
+    def get_card_from_id(self, card_id: int) -> Card:
+        output = self.conn.execute("select * from Cards where id = ?", (card_id,)).fetchone()
         if output is None:
-            raise Exception("no player with id", player_id)
-        return create_player(output)
+            raise Exception("no card with id", card_id)
+        return create_card(output)
 
     def get_trade_from_id(self, trade_id: int) -> Trade:
         output = self.conn.execute("select * from Trades where id = ?", (trade_id,)).fetchone()
@@ -127,7 +123,31 @@ class QueryEngine:
             raise Exception("no user with username", username)
         return create_user(output)
 
+    def get_user_cards(self, user_id: int) -> Tuple[Card]:
+        u: User = self.get_user_from_id(user_id)
+        user_cards: List[Card] = []
+        for card_id in u.cards:
+            user_cards.append(self.get_card_from_id(card_id))
+
+        return tuple(user_cards)
+
+    def get_user_trades(self, user_id: int) -> Tuple[Trade]:
+        u: User = self.get_user_from_id(user_id)
+        user_trades: List[Trade] = []
+        for trade_id in u.trades:
+            user_trades.append(self.get_trade_from_id(trade_id))
+
+        return tuple(user_trades)
+
     # TODO: Write functions to add users and trades
+    def add_user(self, username: str, cards: List[int], trades: List[int]) -> None:
+        try:
+            self.conn.execute("insert into Users (name, cards, trades) values (?, ?, ?)", (username, cards, trades))
+        except sqlite3.IntegrityError as err:
+            print("ERROR:", err)
+            self.conn.rollback()
+        else:
+            self.conn.commit()
 
 
 def load_database(db_loc: str, schema_loc: str) -> None:
@@ -141,15 +161,15 @@ def load_database(db_loc: str, schema_loc: str) -> None:
                 schema = schema_file.read()
             conn.executescript(schema)
 
-            with open("NBAdata.csv", 'r') as players_file:
-                players = csv.DictReader(players_file)
+            with open("NBAdata.csv", 'r') as cards_file:
+                cards = csv.DictReader(cards_file)
 
-                sql = """insert into Players (name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
+                sql = """insert into Cards (name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
                 values (:NAME, :TEAM, :POS, :AGE, :GP, :MPG, :FTA, :FTpct, :2PA, :2Ppct, :3PA, :3Ppct, :SHOOTINGpct, :PPOINTSPG, :REBOUNDSPG, :ASSISTSPG, :STEALSPG, :BLOCKSPG)
                 """
 
                 cursor = conn.cursor()
-                cursor.executemany(sql, players)
+                cursor.executemany(sql, cards)
 
         conn.commit()
 
@@ -162,7 +182,7 @@ def load_test_data(db_loc: str) -> None:
         sqlite3.register_converter("json", json_list_converter)
         # TODO: Create csv files with test data for Users and Trades to make this easier and more robust
         conn.execute("insert into Users (name, cards, trades) values ('chuck', ?, ?), ('nolan', ?, ?)", ([1, 2, 3], [1], [4], [1]))
-        conn.execute("insert into Trades (user1_id, user1_players, user2_id, user2_players) values (1, ?, 2, ?)", ([1], [4]))
+        conn.execute("insert into Trades (user1_id, user1_cards, user2_id, user2_cards) values (1, ?, 2, ?)", ([1], [4]))
         conn.commit()
 
 
@@ -174,6 +194,5 @@ if __name__ == "__main__":
     qe = QueryEngine(db_filename)
     user1 = qe.get_user_from_id(1)
     user2 = qe.get_user_from_username('chuck')
-    print(user1, user2)
-    print(qe.get_player_from_id(55))
-    print(qe.get_trade_from_id(1))
+    qe.add_user("dean", [5, 56], [])
+    print(qe.get_user_cards(3))
