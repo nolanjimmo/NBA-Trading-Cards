@@ -4,6 +4,15 @@
 ##Beginning of the flask app for the interface of the project
 
 from flask import Flask, render_template, request
+from query_engine import *
+
+db_filename = "trading_card_data.db"
+schema_filename = "trading_card_schema.sql"
+
+load_database(db_filename, schema_filename)
+###Test data for the database
+load_test_data(db_filename)
+qe = QueryEngine(db_filename)
 
 app = Flask(__name__)
 
