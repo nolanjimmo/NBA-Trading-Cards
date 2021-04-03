@@ -23,14 +23,14 @@ create table if not exists Players (
 create table if not exists Users (
     id integer primary key,
     name text not null,
-    cards text not null,
-    trades text not null
+    cards text,
+    trades text
 );
 
 create table if not exists Trades (
     id integer primary key,
     user1_id integer not null references Users,
-    user1_players text not null,
+    user1_players text,
     user2_id integer not null references Users,
-    user2_players text not null
+    user2_players text
 );
