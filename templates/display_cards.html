@@ -5,6 +5,9 @@
 </head>
     <body>
         <h1> This is the card display page!</h1>
-        <h2>The cards that you have in your inventory will display here</h2> 
+        <h2>Here are the cards in your inventory:</h2>
+        {%for card in p_list%}
+            <p>{{card.name}}</p>
+        {%endfor%} 
     </body>
 </html>
