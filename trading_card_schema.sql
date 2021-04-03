@@ -1,6 +1,6 @@
 create table if not exists Players (
     id integer primary key,
-    name text not null,
+    name text not null unique,
     team text not null,
     pos text not null,
     age real not null,
@@ -23,14 +23,14 @@ create table if not exists Players (
 create table if not exists Users (
     id integer primary key,
     name text not null unique,
-    cards text,
-    trades text
+    cards json,
+    trades json
 );
 
 create table if not exists Trades (
     id integer primary key,
     user1_id integer not null references Users,
-    user1_players text,
+    user1_players json,
     user2_id integer not null references Users,
-    user2_players text
+    user2_players json
 );
