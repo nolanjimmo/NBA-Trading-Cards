@@ -146,7 +146,8 @@ def load_test_data(db_loc: str) -> None:
 
 
 if __name__ == "__main__":
-    os.remove(db_filename)
+    if os.path.exists(db_filename):
+        os.remove(db_filename)
     load_database(db_filename, schema_filename)
     load_test_data(db_filename)
     qe = QueryEngine(db_filename)
