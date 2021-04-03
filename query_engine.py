@@ -1,8 +1,9 @@
 import os
 import sqlite3
 import csv
+import json
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, List
 
 db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
@@ -10,6 +11,14 @@ schema_filename = "trading_card_schema.sql"
 
 def parse_ids(ids: str) -> Tuple[int]:
     return tuple([int(id) for id in ids.split(",")])
+
+
+def json_list_adapter(l: List) -> bytes:
+    return json.dumps(l).encode("utf-8")
+
+
+def json_list_converter(data: bytes) -> List[int]:
+    return json.loads(data.decode("utf-8"))
 
 
 @dataclass
@@ -70,8 +79,8 @@ class Trade:
     user2_players: Tuple[int]
 
 
-def create_trade(trade_data: Tuple[int, int, str, int, str]) -> Trade:
-    return Trade(trade_data[0], trade_data[1], parse_ids(trade_data[2]), trade_data[3], parse_ids(trade_data[4]))
+def create_trade(trade_data: Tuple[int, int, List[int], int, List[int]]) -> Trade:
+    return Trade(trade_data[0], trade_data[1], tuple(trade_data[2]), trade_data[3], tuple(trade_data[4]))
 
 
 @dataclass
@@ -82,23 +91,25 @@ class User:
     trades: Tuple[int]
 
 
-def create_user(user_data: Tuple[int, str, str, str]) -> User:
-    return User(user_data[0], user_data[1], parse_ids(user_data[2]), parse_ids(user_data[3]))
+def create_user(user_data: Tuple[int, str, List[int], List[int]]) -> User:
+    return User(user_data[0], user_data[1], tuple(user_data[2]), tuple(user_data[3]))
 
 
 class QueryEngine:
     conn: sqlite3.Connection
 
     def __init__(self, db_loc: str):
-        self.conn = sqlite3.connect(db_loc)
+        self.conn = sqlite3.connect(db_loc, detect_types=sqlite3.PARSE_DECLTYPES)
+        sqlite3.register_adapter(list, json_list_adapter)
+        sqlite3.register_converter("json", json_list_converter)
 
-    def get_player(self, player_id: int) -> Player:
+    def get_player_from_id(self, player_id: int) -> Player:
         output = self.conn.execute("select * from Players where id = ?", (player_id,)).fetchone()
         if output is None:
             raise Exception("no player with id", player_id)
         return create_player(output)
 
-    def get_trade(self, trade_id: int) -> Trade:
+    def get_trade_from_id(self, trade_id: int) -> Trade:
         output = self.conn.execute("select * from Trades where id = ?", (trade_id,)).fetchone()
         if output is None:
             raise Exception("no trade with id", trade_id)
@@ -122,7 +133,9 @@ class QueryEngine:
 def load_database(db_loc: str, schema_loc: str) -> None:
     conn: sqlite3.Connection
     db_exists = os.path.exists(db_loc)
-    with sqlite3.connect(db_loc) as conn:
+    with sqlite3.connect(db_loc, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+        sqlite3.register_adapter(list, json_list_adapter)
+        sqlite3.register_converter("json", json_list_converter)
         if not db_exists:
             with open(schema_loc, 'rt') as schema_file:
                 schema = schema_file.read()
@@ -144,10 +157,12 @@ def load_database(db_loc: str, schema_loc: str) -> None:
 def load_test_data(db_loc: str) -> None:
     conn: sqlite3.Connection
 
-    with sqlite3.connect(db_loc) as conn:
+    with sqlite3.connect(db_loc, detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+        sqlite3.register_adapter(list, json_list_adapter)
+        sqlite3.register_converter("json", json_list_converter)
         # TODO: Create csv files with test data for Users and Trades to make this easier and more robust
-        conn.execute("insert into Users (name, cards, trades) values ('chuck', '1,2,3', '1'), ('nolan', '2', '1')")
-        conn.execute("insert into Trades (user1_id, user1_players, user2_id, user2_players) values (1, '1', 2, '2')")
+        conn.execute("insert into Users (name, cards, trades) values ('chuck', ?, ?), ('nolan', ?, ?)", ([1, 2, 3], [1], [4], [1]))
+        conn.execute("insert into Trades (user1_id, user1_players, user2_id, user2_players) values (1, ?, 2, ?)", ([1], [4]))
         conn.commit()
 
 
@@ -160,5 +175,5 @@ if __name__ == "__main__":
     user1 = qe.get_user_from_id(1)
     user2 = qe.get_user_from_username('chuck')
     print(user1, user2)
-    print(qe.get_player(55))
-    print(qe.get_trade(1))
+    print(qe.get_player_from_id(55))
+    print(qe.get_trade_from_id(1))
