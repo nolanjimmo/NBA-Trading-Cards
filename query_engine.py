@@ -91,6 +91,14 @@ def create_user(user_data: Tuple[int, str, List[int], List[int]]) -> User:
     return User(user_data[0], user_data[1], tuple(user_data[2]), tuple(user_data[3]))
 
 
+def check_user_has_cards(user_cards: Tuple[int], cards: List[int]):
+    for card in cards:
+        if card not in user_cards:
+            return False
+
+    return True
+
+
 class QueryEngine:
     conn: sqlite3.Connection
 
@@ -109,6 +117,12 @@ class QueryEngine:
         output = self.conn.execute("select * from Trades where id = ?", (trade_id,)).fetchone()
         if output is None:
             raise Exception("no trade with id", trade_id)
+        return create_trade(output)
+
+    def get_trade_from_values(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]) -> Trade:
+        output = self.conn.execute("select * from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ?", (user1_id, user1_cards, user2_id, user2_cards)).fetchone()
+        if output is None:
+            raise Exception("no trade with values", user1_id, user1_cards, user2_id, user2_cards)
         return create_trade(output)
 
     def get_user_from_id(self, user_id: int) -> User:
@@ -149,6 +163,35 @@ class QueryEngine:
         else:
             self.conn.commit()
 
+    def __add_trade(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]) -> None:
+        try:
+            self.conn.execute("insert into Trades (user1_id, user1_cards, user2_id, user2_cards) "
+                              "values (?, ?, ?, ?)", (user1_id, user1_cards, user2_id, user2_cards))
+        except Exception as err:
+            print("ERROR:", err)
+            self.conn.rollback()
+        else:
+            self.conn.commit()
+
+    def __check_trade_exists(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]) -> bool:
+        return len(self.conn.execute("select 1 from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ? limit 1", (user1_id, user1_cards, user2_id, user2_cards)).fetchall()) > 0
+
+    def __add_trade_to_user(self, user_id: int, trade_id: int):
+        u: User = self.get_user_from_id(user_id)
+        new_user_trades: List[int] = list(u.trades)
+        new_user_trades.append(trade_id)
+        self.conn.execute("update Users set trades = ? where id = ?", (new_user_trades, user_id))
+        self.conn.commit()
+
+    def create_trade(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]):
+        if check_user_has_cards(self.get_user_from_id(user1_id).cards, user1_cards) and \
+                check_user_has_cards(self.get_user_from_id(user2_id).cards, user2_cards):
+            if not self.__check_trade_exists(user1_id, user1_cards, user2_id, user2_cards):
+                self.__add_trade(user1_id, user1_cards, user2_id, user2_cards)
+                new_trade: Trade = self.get_trade_from_values(user1_id, user1_cards, user2_id, user2_cards)
+                self.__add_trade_to_user(user1_id, new_trade.id)
+                self.__add_trade_to_user(user2_id, new_trade.id)
+
 
 def load_database(db_loc: str, schema_loc: str) -> None:
     conn: sqlite3.Connection
@@ -181,8 +224,10 @@ def load_test_data(db_loc: str) -> None:
         sqlite3.register_adapter(list, json_list_adapter)
         sqlite3.register_converter("json", json_list_converter)
         # TODO: Create csv files with test data for Users and Trades to make this easier and more robust
-        conn.execute("insert into Users (name, cards, trades) values ('chuck', ?, ?), ('nolan', ?, ?)", ([1, 2, 3], [1], [4], [1]))
-        conn.execute("insert into Trades (user1_id, user1_cards, user2_id, user2_cards) values (1, ?, 2, ?)", ([1], [4]))
+        conn.execute("insert into Users (name, cards, trades) values ('chuck', ?, ?), ('nolan', ?, ?)",
+                     ([1, 2, 3], [1], [4], [1]))
+        conn.execute("insert into Trades (user1_id, user1_cards, user2_id, user2_cards) values (1, ?, 2, ?)",
+                     ([1], [4]))
         conn.commit()
 
 
@@ -195,4 +240,8 @@ if __name__ == "__main__":
     user1 = qe.get_user_from_id(1)
     user2 = qe.get_user_from_username('chuck')
     qe.add_user("dean", [5, 56], [])
-    print(qe.get_user_cards(3))
+    print(qe.get_user_trades(1))
+    print(qe.get_user_trades(2))
+    qe.create_trade(1, [3], 2, [4])
+    print(qe.get_user_trades(1))
+    print(qe.get_user_trades(2))
