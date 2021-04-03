@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+from typing import List
 
 
 def load_database(connection_str: str) -> None:
@@ -8,6 +9,7 @@ def load_database(connection_str: str) -> None:
     try:
         conn.execute("drop table Players")
         conn.execute("drop table Users")
+        conn.execute("drop table Trades")
     except sqlite3.OperationalError as err:
         print("table does not exist", err)
 
@@ -42,32 +44,33 @@ def load_database(connection_str: str) -> None:
     trades text not null)
     """)
 
+    conn.execute("""
+    create table Trades (
+    id integer primary key,
+    user1_id integer not null references Users,
+    user1_players text not null,
+    user2_id integer not null references Users,
+    user2_players text not null)
+    """)
+
     with open("NBAdata.csv", 'r') as players_file:
         players = csv.DictReader(players_file)
-        player_id: int = 0
         for player in players:
-            conn.execute("insert into Players values (" +
-                         str(player_id) + ", '" +
-                         player["FULL NAME"].replace("'", "''") + "', '" +
-                         player["TEAM"] + "', '" +
-                         player["POS"] + "', " +
-                         player["AGE"] + ", " +
-                         player["GP"] + ", " +
-                         player["MPG"] + ", " +
-                         player["FTA"] + ", " +
-                         player["FTpct"] + ", " +
-                         player["2PA"] + ", " +
-                         player["2Ppct"] + ", " +
-                         player["3PA"] + ", " +
-                         player["3Ppct"] + ", " +
-                         player["SHOOTINGpct"] + ", " +
-                         player["PPOINTSPG"] + ", " +
-                         player["REBOUNDSPG"] + ", " +
-                         player["ASSISTSPG"] + ", " +
-                         player["STEALSPG"] + ", " +
-                         player["BLOCKSPG"] + ")")
-
-            player_id += 1
+            player_data: List[str] = []
+            for key, value in player.items():
+                if key == "FULL NAME" or \
+                        key == "TEAM" or \
+                        key == "POS":
+                    value = value.replace("'", "''")
+                    player_data.append(f'\'{value}\'')
+                else:
+                    player_data.append(value)
+            conn.execute(f"""
+            insert into Players (
+                name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, 
+                shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
+            values ({", ".join(player_data)})
+            """)
 
     conn.commit()
     conn.close()
@@ -76,3 +79,4 @@ def load_database(connection_str: str) -> None:
 if __name__ == "__main__":
     load_database("trading_card_data.db")
     conn = sqlite3.connect("trading_card_data.db")
+    print(conn.execute("select * from Players limit 5").fetchall())
