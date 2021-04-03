@@ -5,6 +5,10 @@
 </head>
     <body>
         <h1> This is the card display page!</h1>
-        <h2>You can trade your inventory cards with another user here</h2> 
+        <h2>here is the list of trades you are involved in right now:</h2>
+        {%for trade in t_list%}
+            <p>From {{trade.user1_id}} to {{trade.user2_id}}</p>
+            <p>Player(s): {{trade.user1_players}} for {{trade.user2_players}}</p>
+        {%endfor%}
     </body>
 </html>

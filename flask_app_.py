@@ -62,8 +62,12 @@ def decision():
         #allow the user to look at more cards to buy
          return render_template("buy_cards.html")
     else:
+        trade_list=[]
+        #Here, we are going to display the list of trades the user is currently involved in
+        for trade in curr_user.trades:
+            trade_list.append(qe.get_trade_from_id(trade))
         #display the trading interface
-         return render_template("trade_cards.html")
+        return render_template("trade_cards.html", t_list=trade_list, qe=qe)
 
 
 if __name__ == "__main__":
