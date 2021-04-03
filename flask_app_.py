@@ -51,9 +51,15 @@ def decision():
     qe = QueryEngine(db_filename)
     choice = request.form['selection']
     if choice == "display":
+        card_list = []
+        #Create player classes for each of the player cards that the user has
+        #Store them in a list, then pass that list to the render_template()
+        for card in curr_user.cards:
+            card_list.append(qe.get_card_from_id(card))
         card_list = qe.get_user_cards(curr_user.id)
         #display the users cards by passing list to display_cards.html
         return render_template("display_cards.html", c_list=card_list)
+
     elif choice == "buy":
         #allow the user to look at more cards to buy
          return render_template("buy_cards.html")
