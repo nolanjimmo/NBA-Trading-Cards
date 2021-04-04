@@ -4,11 +4,17 @@
     <title>Display Page</title>
 </head>
     <body>
-        <h1> This is the card display page!</h1>
-        <h2>Here are the cards in your inventory:</h2>
-        {%for card in c_list%}
-            <p>{{card.name}}</p>
-        {%endfor%}
+    <h1> This is the card display page!</h1>
+        {%if length == 0 %}
+            <p>You have no cards</p>
+        {%endif%}
+
+        {%if length > 0 %}
+            <h2>Here are the cards in your inventory:</h2>
+            {%for card in c_list%}
+                <p>{{card.name}}</p>
+            {%endfor%}
+        {%endif%}
         <button><a href="{{ url_for('about') }}">About</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button> 
     </body>

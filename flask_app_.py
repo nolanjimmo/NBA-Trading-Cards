@@ -79,7 +79,7 @@ def decision():
         # Store them in a list, then pass that list to the render_template()
         card_list = qe.get_user_cards(curr_user.id)
         # display the users cards by passing list to display_cards.html
-        return render_template("display_cards.html", c_list=card_list)
+        return render_template("display_cards.html", c_list=card_list, length=len(card_list))
 
     elif choice == "buy":
         all_cards = qe.get_all_cards()
