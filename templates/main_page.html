@@ -17,6 +17,7 @@
         {%if valid_user == False%}
             <p>Username: {{u_name}} is not valid</p>
         {%endif%}
+        <button><a href="{{ url_for('sign_up') }}">Sign Up</a></button>
         <button><a href="{{ url_for('about') }}">About</a></button>
     </body>
 </html>
