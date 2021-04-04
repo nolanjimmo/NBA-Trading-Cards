@@ -113,11 +113,27 @@ class QueryEngine:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
-    def get_all_card_ids(self):
+    def get_all_card_ids(self) -> Tuple[int]:
         output = self.conn.execute("select id from Cards").fetchall()
-        for line in output:
-            str(line)
-        return output
+        if output is None:
+            raise Exception("cards have not been loaded")
+
+        card_ids: List[int] = []
+        for row in output:
+            card_ids.append(row[0])
+
+        return tuple(card_ids)
+
+    def get_all_cards(self) -> Tuple[Card]:
+        output = self.conn.execute("select * from Cards").fetchall()
+        if output is None:
+            raise Exception("cards have not been loaded")
+
+        cards: List[Card] = []
+        for row in output:
+            cards.append(create_card(row))
+
+        return tuple(cards)
 
     def get_card_from_id(self, card_id: int) -> Card:
         output = self.conn.execute("select * from Cards where id = ?", (card_id,)).fetchone()
@@ -296,3 +312,4 @@ if __name__ == "__main__":
         #print(qe.get_user_from_id(1))
         #print(qe.get_user_from_id(2))
         print(qe.get_all_card_ids())
+        print(qe.get_all_cards())

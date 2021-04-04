@@ -60,10 +60,7 @@ def decision():
         return render_template("display_cards.html", c_list=card_list)
 
     elif choice == "buy":
-        all_card_ids = qe.get_all_card_ids()
-        all_cards = []
-        for _id in all_card_ids:
-            all_cards.append(qe.get_card_from_id(_id[0]))
+        all_cards = qe.get_all_cards()
         #allow the user to look at all cards available
         return render_template("buy_cards.html", all_cards = all_cards, qe=qe)
     else:
