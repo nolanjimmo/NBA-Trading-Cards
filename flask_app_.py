@@ -48,21 +48,25 @@ def sign_in():
         return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 
-@app.route("/sign_up", methods=('GET', 'POST'))
+@app.route("/sign_up", methods=['POST'])
 def sign_up():
     qe = QueryEngine(db_filename)
     global username
     global curr_user
     valid_user = None
-    if request.method == 'POST':
-        username = request.form['username']
+    user_exists = None
+    username = request.form['username']
 
-        if qe.get_user_from_id(username) is None:
-            qe.add_user(username, [], [])
-
+    if qe.get_user_from_username(username) is None:
+        qe.add_user(username, [], [])
+    else:
+        user_exists = True
+    try:
         curr_user = qe.get_user_from_username(username)
-
         return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+    except:
+        valid_user = False
+        return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
 
 
 @app.route("/selection", methods=['POST'])

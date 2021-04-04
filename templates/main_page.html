@@ -17,7 +17,16 @@
         {%if valid_user == False%}
             <p>Username: {{u_name}} is not valid</p>
         {%endif%}
-        <button><a href="{{ url_for('sign_up') }}">Sign Up</a></button>
+
+        <p>Register </p>
+        <form action="/sign_up" method="POST">
+            <label for="username">Username</label>
+            <input type="text" name="username">
+            <input type="submit">
+        </form>
+        {%if user_exists == True%}
+            <p>User already exists</p>
+        {%endif%}
         <button><a href="{{ url_for('about') }}">About</a></button>
     </body>
 </html>
