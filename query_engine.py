@@ -269,6 +269,13 @@ class QueryEngine:
                 self.remove_card_from_user(t.user2_id, card)
                 self.add_card_to_user(t.user1_id, card)
 
+    def does_user_exist(self, username: str):
+        output = self.conn.execute("select * from Users where name = ?", (username,)).fetchone()
+        if output is None:
+            return False
+        else:
+            return True
+
 
 def load_database(db_loc: str, schema_loc: str) -> None:
     conn: sqlite3.Connection

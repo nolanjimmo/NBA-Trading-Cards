@@ -54,18 +54,18 @@ def sign_up():
     global username
     global curr_user
     valid_user = None
-    user_exists = None
+    user_exists = False
     username = request.form['username']
 
-    if qe.get_user_from_username(username) is None:
+    if not qe.does_user_exist(username):
         qe.add_user(username, [], [])
     else:
         user_exists = True
-    try:
+
+    if not user_exists:
         curr_user = qe.get_user_from_username(username)
         return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
-    except:
-        valid_user = False
+    else:
         return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
 
 
