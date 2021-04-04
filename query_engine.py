@@ -113,6 +113,12 @@ class QueryEngine:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
+    def get_all_card_ids(self):
+        output = self.conn.execute("select id from Cards").fetchall()
+        for line in output:
+            str(line)
+        return output
+
     def get_card_from_id(self, card_id: int) -> Card:
         output = self.conn.execute("select * from Cards where id = ?", (card_id,)).fetchone()
         if output is None:
@@ -284,8 +290,9 @@ if __name__ == "__main__":
 
     with QueryEngine(db_filename) as qe:
         load_test_data(qe)
-        print(qe.get_user_from_id(1))
-        print(qe.get_user_from_id(2))
+        #print(qe.get_user_from_id(1))
+        #print(qe.get_user_from_id(2))
         qe.do_trade(1)
-        print(qe.get_user_from_id(1))
-        print(qe.get_user_from_id(2))
+        #print(qe.get_user_from_id(1))
+        #print(qe.get_user_from_id(2))
+        print(qe.get_all_card_ids())

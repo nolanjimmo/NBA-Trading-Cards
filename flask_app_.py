@@ -13,7 +13,8 @@ if os.path.exists(db_filename):
         os.remove(db_filename)
 load_database(db_filename, schema_filename)
 ###Test data for the database
-load_test_data(db_filename)
+qe = QueryEngine(db_filename)
+load_test_data(qe)
 
 app = Flask(__name__)
 
@@ -54,15 +55,17 @@ def decision():
         card_list = []
         #Create player classes for each of the player cards that the user has
         #Store them in a list, then pass that list to the render_template()
-        for card in curr_user.cards:
-            card_list.append(qe.get_card_from_id(card))
         card_list = qe.get_user_cards(curr_user.id)
         #display the users cards by passing list to display_cards.html
         return render_template("display_cards.html", c_list=card_list)
 
     elif choice == "buy":
-        #allow the user to look at more cards to buy
-         return render_template("buy_cards.html")
+        all_card_ids = qe.get_all_card_ids()
+        all_cards = []
+        for _id in all_card_ids:
+            all_cards.append(qe.get_card_from_id(_id[0]))
+        #allow the user to look at all cards available
+        return render_template("buy_cards.html", all_cards = all_cards, qe=qe)
     else:
         trade_list=[]
         #Here, we are going to display the list of trades the user is currently involved in

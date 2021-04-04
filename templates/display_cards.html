@@ -8,6 +8,8 @@
         <h2>Here are the cards in your inventory:</h2>
         {%for card in c_list%}
             <p>{{card.name}}</p>
-        {%endfor%} 
+        {%endfor%}
+        <button><a href="{{ url_for('about') }}">About</a></button>
+        <button><a href="{{ url_for('sign_in') }}">Sign In</a></button> 
     </body>
 </html>
