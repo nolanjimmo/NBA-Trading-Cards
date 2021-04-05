@@ -246,6 +246,9 @@ class QueryEngine:
             for card in t.user2_cards:
                 self.remove_card_from_user(t.user2_id, card)
                 self.add_card_to_user(t.user1_id, card)
+            return True
+        else:
+            return False
 
 
 def load_database(db_loc: str, schema_loc: str) -> None:
@@ -290,9 +293,8 @@ if __name__ == "__main__":
 
     with QueryEngine(db_filename) as qe:
         load_test_data(qe)
-        #print(qe.get_user_from_id(1))
-        #print(qe.get_user_from_id(2))
+        print(qe.get_user_from_id(1))
+        print(qe.get_user_from_id(2))
         qe.do_trade(1)
-        #print(qe.get_user_from_id(1))
-        #print(qe.get_user_from_id(2))
-        print(qe.get_all_card_ids())
+        print(qe.get_user_from_id(1))
+        print(qe.get_user_from_id(2))

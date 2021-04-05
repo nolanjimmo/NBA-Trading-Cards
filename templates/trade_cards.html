@@ -4,9 +4,17 @@
     <title>Trade Page</title>
 </head>
     <body>
-        <h1> This is the card display page!</h1>
-        <h2>here is the list of trades you are involved in right now:</h2>
+        <h1>This is the card display page for {{c_user.name}}!</h1>
+        <h2>Here is the list of trades you are involved in right now:</h2>
+        {%if rft%}
+            {%if ts%}
+                <p>Your last trade was successful! It should no longer appear in your list of trades</p>
+            {%else:%}
+                <p>Your last trade was not successful, please check the trade ID that you entered and enter the correct IDs</p>
+            {%endif%}
+        {%endif%}
         {%for trade in t_list%}
+            <h3>Trade ID: {{trade.id}}</h3>
             <p>Between {{qe.get_user_from_id(trade.user1_id).name}} and {{qe.get_user_from_id(trade.user2_id).name}}</p>
             <p> {{qe.get_user_from_id(trade.user1_id).name}} Players: 
             {%for card in trade.user1_cards%}
@@ -17,6 +25,13 @@
                 {{qe.get_card_from_id(card).name}}
             {%endfor%}
             </p>
+            {%if c_user.id == trade.user2_id:%}
+            <p>Trade ID for trade to complete:</p>
+            <form action="/trade_cards" method="POST">
+                <input type="text" name="trade_id"></input>
+                <input type="submit"></input>
+            </form>
+            {%endif%}
         {%endfor%}
         <button><a href="{{ url_for('about') }}">About</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
