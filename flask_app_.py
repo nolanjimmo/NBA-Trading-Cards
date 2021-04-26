@@ -3,6 +3,8 @@
 
 ##Beginning of the flask app for the interface of the project
 
+import traceback
+
 from flask import Flask, render_template, request, redirect, url_for
 from query_engine import *
 
@@ -10,7 +12,7 @@ db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
 
 if os.path.exists(db_filename):
-        os.remove(db_filename)
+    os.remove(db_filename)
 load_database(db_filename, schema_filename)
 ###Test data for the database
 qe = QueryEngine(db_filename)
@@ -24,7 +26,7 @@ curr_user = None
 
 @app.route("/")
 def home():
-    return render_template("main_page.html", u_name = username)
+    return render_template("main_page.html", u_name=username)
 
 
 @app.route("/about")
@@ -50,25 +52,48 @@ def sign_in():
         valid_user = False
         return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
+
+@app.route("/sign_up", methods=['POST'])
+def sign_up():
+    qe = QueryEngine(db_filename)
+    global username
+    global curr_user
+    valid_user = None
+    user_exists = False
+    username = request.form['username']
+
+    if not qe.does_user_exist(username):
+        qe.add_user(username, [], [])
+    else:
+        user_exists = True
+
+    if not user_exists:
+        curr_user = qe.get_user_from_username(username)
+        return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+    else:
+        return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
+
+
+@app.route("/successful_sign_in", methods=['POST'])
+def successful_sign_in():
+     return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+
 @app.route("/selection", methods=['POST'])
 def decision():
     qe = QueryEngine(db_filename)
     choice = request.form['selection']
     if choice == "display":
         card_list = []
-        #Create player classes for each of the player cards that the user has
-        #Store them in a list, then pass that list to the render_template()
+        # Create player classes for each of the player cards that the user has
+        # Store them in a list, then pass that list to the render_template()
         card_list = qe.get_user_cards(curr_user.id)
-        #display the users cards by passing list to display_cards.html
-        return render_template("display_cards.html", c_list=card_list)
+        # display the users cards by passing list to display_cards.html
+        return render_template("display_cards.html", c_list=card_list, length=len(card_list))
 
     elif choice == "buy":
-        all_card_ids = qe.get_all_card_ids()
-        all_cards = []
-        for _id in all_card_ids:
-            all_cards.append(qe.get_card_from_id(_id[0]))
-        #allow the user to look at all cards available
-        return render_template("buy_cards.html", all_cards = all_cards, qe=qe)
+        all_cards = qe.get_all_cards()
+        # allow the user to look at all cards available
+        return render_template("buy_cards.html", all_cards=all_cards, qe=qe)
     else:
         #trade_list=[]
         #Here, we are going to display the list of trades the user is currently involved in
@@ -81,20 +106,20 @@ def decision():
 @app.route("/trade_cards", methods=['POST','GET'])
 def trade_interface():
     qe = QueryEngine(db_filename)
-    trade_list= get_trade_list()
+    trade_list = get_trade_list()
     trade_success = False
 
     try: 
         trade_id = int(request.form['trade_id'])
         if trade_id in curr_user.trades:
             trade_success = qe.do_trade(trade_id)
+        #print(trade_success)
         if trade_success == True:
-            trade_list = get_trade_list()
-            return render_template("trade_cards.html", t_list = trade_list, qe=qe, c_user=curr_user, rft=True, ts=True)
+            return render_template("successful_sign_in.html", u_name = username, valid_user = True)
         else:
             return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=True, ts=False)
     except:
-        print("exception")
+        print(traceback.print_exc())
         return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=False, ts=False)
 
 def get_trade_list():

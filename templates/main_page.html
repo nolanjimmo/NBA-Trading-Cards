@@ -9,13 +9,24 @@
         {%if valid_user == False%}
             <p>Please try again</p>
         {%endif%}
-        <p>Username</p>
+        <p>Sign in</p>
         <form action="/sign_in" method="POST">
+            <label for="username">Username</label>
             <input type="text" name="username"></input>
-            <input type="submit"></input>
+            <input type="submit" value="Sign In"></input>
         </form>
         {%if valid_user == False%}
             <p>Username: {{u_name}} is not valid</p>
+        {%endif%}
+
+        <p>Register </p>
+        <form action="/sign_up" method="POST">
+            <label for="username">Username</label>
+            <input type="text" name="username">
+            <input type="submit" value="Register">
+        </form>
+        {%if user_exists == True%}
+            <p>User already exists</p>
         {%endif%}
         <button><a href="{{ url_for('about') }}">About</a></button>
     </body>

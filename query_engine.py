@@ -113,11 +113,27 @@ class QueryEngine:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
-    def get_all_card_ids(self):
+    def get_all_card_ids(self) -> Tuple[int]:
         output = self.conn.execute("select id from Cards").fetchall()
-        for line in output:
-            str(line)
-        return output
+        if output is None:
+            raise Exception("cards have not been loaded")
+
+        card_ids: List[int] = []
+        for row in output:
+            card_ids.append(row[0])
+
+        return tuple(card_ids)
+
+    def get_all_cards(self) -> Tuple[Card]:
+        output = self.conn.execute("select * from Cards").fetchall()
+        if output is None:
+            raise Exception("cards have not been loaded")
+
+        cards: List[Card] = []
+        for row in output:
+            cards.append(create_card(row))
+
+        return tuple(cards)
 
     def get_card_from_id(self, card_id: int) -> Card:
         output = self.conn.execute("select * from Cards where id = ?", (card_id,)).fetchone()
@@ -126,13 +142,16 @@ class QueryEngine:
         return create_card(output)
 
     def get_trade_from_id(self, trade_id: int) -> Trade:
-        output = self.conn.execute("select * from Trades where id = ?", (trade_id,)).fetchone()
+        output = self.conn.execute("select * from Trades where id = ?", str(trade_id)).fetchone()
         if output is None:
             raise Exception("no trade with id", trade_id)
         return create_trade(output)
 
-    def get_trade_from_values(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]) -> Trade:
-        output = self.conn.execute("select * from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ?", (user1_id, user1_cards, user2_id, user2_cards)).fetchone()
+    def get_trade_from_values(self, user1_id: int, user1_cards: List[int], user2_id: int,
+                              user2_cards: List[int]) -> Trade:
+        output = self.conn.execute(
+            "select * from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ?",
+            (user1_id, user1_cards, user2_id, user2_cards)).fetchone()
         if output is None:
             raise Exception("no trade with values", user1_id, user1_cards, user2_id, user2_cards)
         return create_trade(output)
@@ -184,8 +203,11 @@ class QueryEngine:
         else:
             self.conn.commit()
 
-    def __check_trade_exists(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]) -> bool:
-        return len(self.conn.execute("select 1 from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ? limit 1", (user1_id, user1_cards, user2_id, user2_cards)).fetchall()) > 0
+    def __check_trade_exists(self, user1_id: int, user1_cards: List[int], user2_id: int,
+                             user2_cards: List[int]) -> bool:
+        return len(self.conn.execute(
+            "select 1 from Trades where user1_id = ? and user1_cards = ? and user2_id = ? and user2_cards = ? limit 1",
+            (user1_id, user1_cards, user2_id, user2_cards)).fetchall()) > 0
 
     def __add_trade_to_user(self, user_id: int, trade_id: int):
         u: User = self.get_user_from_id(user_id)
@@ -196,7 +218,7 @@ class QueryEngine:
 
     def check_valid_trade(self, user1_id: int, user1_cards: Tuple[int], user2_id: int, user2_cards: Tuple[int]) -> bool:
         return check_user_has_cards(self.get_user_from_id(user1_id).cards, user1_cards) and \
-                check_user_has_cards(self.get_user_from_id(user2_id).cards, user2_cards)
+               check_user_has_cards(self.get_user_from_id(user2_id).cards, user2_cards)
 
     def create_trade(self, user1_id: int, user1_cards: List[int], user2_id: int, user2_cards: List[int]):
         if self.check_valid_trade(user1_id, tuple(user1_cards), user2_id, tuple(user2_cards)):
@@ -250,6 +272,13 @@ class QueryEngine:
         else:
             return False
 
+    def does_user_exist(self, username: str):
+        output = self.conn.execute("select * from Users where name = ?", (username,)).fetchone()
+        if output is None:
+            return False
+        else:
+            return True
+
 
 def load_database(db_loc: str, schema_loc: str) -> None:
     conn: sqlite3.Connection
@@ -293,8 +322,10 @@ if __name__ == "__main__":
 
     with QueryEngine(db_filename) as qe:
         load_test_data(qe)
-        print(qe.get_user_from_id(1))
-        print(qe.get_user_from_id(2))
+        # print(qe.get_user_from_id(1))
+        # print(qe.get_user_from_id(2))
         qe.do_trade(1)
-        print(qe.get_user_from_id(1))
-        print(qe.get_user_from_id(2))
+        # print(qe.get_user_from_id(1))
+        # print(qe.get_user_from_id(2))
+        print(qe.get_all_card_ids())
+        print(qe.get_all_cards())
