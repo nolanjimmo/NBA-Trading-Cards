@@ -74,9 +74,10 @@ def sign_up():
         return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
 
 
-@app.route("/successful_sign_in", methods=['POST'])
+@app.route("/successful_sign_in", methods=['POST','GET'])
 def successful_sign_in():
-     return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+    global username
+    return render_template("successful_sign_in.html", u_name=username, valid_user=True)
 
 @app.route("/selection", methods=['POST'])
 def decision():
@@ -103,9 +104,17 @@ def decision():
         #return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user)
         return redirect(url_for("trade_interface"))
 
+@app.route("/buying_cards", methods=['POST','GET'])
+def buying_cards():
+    #TODO allow for the acquiring of new cards by each user
+    pass
+
 @app.route("/trade_cards", methods=['POST','GET'])
 def trade_interface():
+    global curr_user
+
     qe = QueryEngine(db_filename)
+    curr_user = qe.get_user_from_username(username)
     trade_list = get_trade_list()
     trade_success = False
 

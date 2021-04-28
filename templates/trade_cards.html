@@ -13,6 +13,9 @@
                 <p>Your last trade was not successful, please check the trade ID that you entered and enter the correct IDs</p>
             {%endif%}
         {%endif%}
+        {%if not t_list%}
+            <p>You have no pending trades!</p>
+        {%endif%}
         {%for trade in t_list%}
             <h3>Trade ID: {{trade.id}}</h3>
             <p>Between {{qe.get_user_from_id(trade.user1_id).name}} and {{qe.get_user_from_id(trade.user2_id).name}}</p>
@@ -35,6 +38,6 @@
         {%endfor%}
         <button><a href="{{ url_for('about') }}">About</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
-        <button><a href="{{ url_for('successful_sign_in') }}">Sign In</a></button>
+        <button><a href="{{ url_for('successful_sign_in') }}">Dashboard</a></button>
     </body>
 </html>
