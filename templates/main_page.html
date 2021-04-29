@@ -1,16 +1,17 @@
 <!doctype html>
 <html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <head>
     <title>Home Page</title>
 </head>
-    <body>
+    <body id="main">
         <h1> This is the home page!</h1>
-        <h1> Sign in to access your card trading system!</h1>
+        <h2> Sign in to access your card trading system!</h2>
         {%if valid_user == False%}
             <p>Please try again</p>
         {%endif%}
-        <p>Sign in</p>
-        <form action="/sign_in" method="POST">
+        <form action="/sign_in" method="POST" class="form" id="signin">
+            <p>Sign in</p>
             <label for="username">Username</label>
             <input type="text" name="username"></input>
             <input type="submit" value="Sign In"></input>
@@ -19,8 +20,8 @@
             <p>Username: {{u_name}} is not valid</p>
         {%endif%}
 
-        <p>Register </p>
-        <form action="/sign_up" method="POST">
+        <form action="/sign_up" method="POST" class="form" id="signup">
+            <p>Register </p>
             <label for="username">Username</label>
             <input type="text" name="username">
             <input type="submit" value="Register">

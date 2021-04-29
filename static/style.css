@@ -1,0 +1,24 @@
+* {
+    font-family: Georgia, serif;
+}
+
+body {
+  background: #F8F8FF;
+}
+
+.form {
+    background: dodgerblue;
+    margin: 0em 1em 1em 0em;
+    border-radius: .5em .5em .5em .5em;
+    padding: 0em .5em .5em .5em;
+    border: 3px solid black;
+    display: inline-block;
+}
+
+.form:hover {
+    border: 3px solid darkred;
+}
+
+#main button {
+    display: block;
+}
