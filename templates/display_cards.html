@@ -16,8 +16,8 @@
                 <p>{{card.name}}, {{card.pos}}</p>
             {%endfor%}
         {%endif%}
-        <button><a href="{{ url_for('home') }}">Home</a></button>
+
+        <button><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
-        <button><a href="{{ url_for('successful_sign_in') }}">Dashboard</a></button>
     </body>
 </html>
