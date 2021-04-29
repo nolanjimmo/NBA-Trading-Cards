@@ -5,8 +5,39 @@
 </head>
     <body>
         <h1> This is the card purchasing page!</h1>
-        <h2>Any cards that are available for purchase will be displayed here</h2>
-        <p>Here are the cards that we have available:</p>
+        <h2>Any cards that are available for selection will be displayed here</h2>
+        <h3>If you already have 5 players, you will need to select a player to drop</h3>
+        <h3>If not, you will be able to add any player on the list</h3>
+        {% block content%}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        {% endblock%}                
+        {%if u_cards|length == 0 %}
+            <p>You have no cards</p>
+        {%endif%}
+
+        {%if u_cards|length > 0 %}
+            <h2>Here are the cards in your inventory:</h2>
+            {%for card in u_cards%}
+                <p>{{card.name}}</p>
+            {%endfor%}
+        {%endif%}
+
+        <form action="/buying_cards" method="POST">
+            <label for="add">Add Player</label>
+            <input type="text" name="add"></input>
+            <label for="drop">Drop Player</label>
+            <input type="text" name="drop"></input>
+            <input type="submit" value="Submit"></input>
+        </form>
+
+        <br>
+        <h2>Here are the cards that we have available:</h2>
         {%for card in all_cards%}
             <p>{{card.name}}</p>
         {%endfor%}

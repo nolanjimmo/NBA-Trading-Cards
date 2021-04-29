@@ -5,7 +5,7 @@
 
 import traceback
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for
 from query_engine import *
 
 db_filename = "trading_card_data.db"
@@ -19,6 +19,7 @@ qe = QueryEngine(db_filename)
 load_test_data(qe)
 
 app = Flask(__name__)
+app.secret_key = "final_project"
 
 username = ""
 curr_user = None
@@ -92,9 +93,10 @@ def decision():
         return render_template("display_cards.html", c_list=card_list, length=len(card_list))
 
     elif choice == "buy":
-        all_cards = qe.get_all_cards()
+        #all_cards = qe.get_all_cards()
         # allow the user to look at all cards available
-        return render_template("buy_cards.html", all_cards=all_cards, qe=qe)
+        #return render_template("buy_cards.html", all_cards=all_cards, qe=qe)
+        return redirect(url_for("buying_cards"))
     else:
         #trade_list=[]
         #Here, we are going to display the list of trades the user is currently involved in
@@ -106,8 +108,53 @@ def decision():
 
 @app.route("/buying_cards", methods=['POST','GET'])
 def buying_cards():
-    #TODO allow for the acquiring of new cards by each user
-    pass
+    global curr_user
+    qe = QueryEngine(db_filename)
+    curr_user = qe.get_user_from_username(username)
+    user_cards = qe.get_user_cards(curr_user.id)
+    all_cards = qe.get_all_cards()
+    rm_success = None
+
+    try:
+        add_player = request.form['add']
+        if len(curr_user.cards) >= 5:
+            try:
+                drop_player = request.form['drop']
+                rm_success = remove_card(drop_player)
+            except:
+                print("input was bad")
+                #print(traceback.print_exc())
+                return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+        if rm_success != False:
+            add_new_card(add_player)
+        else:
+            print("here")
+            flash("You can't add a player without dropping one")
+            return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+        user_cards = qe.get_user_cards(curr_user.id)
+        all_cards = qe.get_all_cards()
+        return render_template("successful_sign_in.html", u_name = username, valid_user = True)
+        #return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+    except:
+        #print(traceback.print_exc())
+        return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+
+def add_new_card(card_name):
+    qe = QueryEngine(db_filename)
+    new_card = qe.get_card_from_name(card_name)
+    qe.add_card_to_user(curr_user.id, new_card.id)
+
+def remove_card(card_name) -> bool:
+    qe = QueryEngine(db_filename)
+    try:
+        temp_card = qe.get_card_from_name(card_name)
+    except:
+        return False
+    for card in curr_user.cards:
+        if card == temp_card.id:
+            qe.remove_card_from_user(curr_user.id, card)
+            return True
+    return False
 
 @app.route("/trade_cards", methods=['POST','GET'])
 def trade_interface():

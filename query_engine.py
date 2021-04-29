@@ -141,6 +141,12 @@ class QueryEngine:
             raise Exception("no card with id", card_id)
         return create_card(output)
 
+    def get_card_from_name(self, card_name: str) -> Card:
+        output = self.conn.execute("select * from Cards where name = ?", (card_name,)).fetchone()
+        if output is None:
+            raise Exception("no card with name", card_name)
+        return create_card(output)
+
     def get_trade_from_id(self, trade_id: int) -> Trade:
         output = self.conn.execute("select * from Trades where id = ?", str(trade_id)).fetchone()
         if output is None:
