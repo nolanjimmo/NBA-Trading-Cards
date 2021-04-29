@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <head>
     <title>Buy Page</title>
 </head>
@@ -38,9 +39,11 @@
 
         <br>
         <h2>Here are the cards that we have available:</h2>
-        {%for card in all_cards%}
-            <p>{{card.name}}</p>
-        {%endfor%}
+        <ul>
+            {%for card in all_cards%}
+                <li>{{card.name}}</li>
+            {%endfor%}
+        </ul>
         <button><a href="{{ url_for('about') }}">About</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
         <button><a href="{{ url_for('successful_sign_in') }}">Dashboard</a></button>

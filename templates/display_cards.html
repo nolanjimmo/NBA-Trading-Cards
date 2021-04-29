@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <head>
     <title>Display Page</title>
 </head>
@@ -12,7 +13,7 @@
         {%if length > 0 %}
             <h2>Here are the cards in your inventory:</h2>
             {%for card in c_list%}
-                <p>{{card.name}}</p>
+                <p>{{card.name}}, {{card.pos}}</p>
             {%endfor%}
         {%endif%}
         <button><a href="{{ url_for('home') }}">Home</a></button>

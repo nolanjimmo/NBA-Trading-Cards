@@ -16,9 +16,24 @@ body {
 }
 
 .form:hover {
-    border: 3px solid darkred;
+    border: 3px solid red;
 }
 
 #main button {
     display: block;
+}
+
+ul{
+    background: white;
+    list-style:none;
+    max-height:300px;
+    max-width: 300px;
+    margin: 0 0 1em 1em;
+    overflow:auto;
+    padding:0;
+    text-indent:10px;
+}
+
+li:nth-child(even){
+    background:lightblue;
 }
