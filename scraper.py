@@ -14,21 +14,16 @@ f = open("players_pic.csv", "w")
 
 for p in players:
     link = p.find('a')['href']
-    name = p.find('a')
-    name = str(name)
-    name = name[36:][:-4]
     link = link[:-4] + "jpg"
-    prelink = link[0:9]
-    postlink = link[11:]
-    link = prelink + postlink
-    # print(name)
+    name = str(p.find('a'))
+    name = name[36:][:-4]
+    link = link[0:9] + link[11:]
+    print(name)
     with open('NBAdata.csv', newline='') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in csvreader:
-            if (name == row[0]):
-                print(row[0])
-                f.write("https://www.basketball-reference.com/req/202104203/images" + link + "," + name +  "\n")
-
-
+            if name == row[0]:
+                # print(row[0])
+                f.write(name + "," + "https://www.basketball-reference.com/req/202104203/images" + link + "\n")
 
 f.close()
