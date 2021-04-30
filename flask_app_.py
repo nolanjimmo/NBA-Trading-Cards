@@ -175,8 +175,19 @@ def trade_interface():
         else:
             return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=True, ts=False)
     except:
-        print(traceback.print_exc())
-        return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=False, ts=False)
+        #print(traceback.print_exc())
+        try:
+            #here, we see if there is any input in the propose trade area
+            other_user = request.form['other_user']
+            u1_player = request.form['u1_player']
+            u2_player = request.form['u2_player']
+            qe.create_trade(curr_user.id, [qe.get_card_from_name(u1_player).id], 
+                    qe.get_user_from_username(other_user).id,[qe.get_card_from_name(u2_player).id])
+            return render_template("successful_sign_in.html", u_name = username, valid_user = True)
+        except:
+            #if there is nothing in either input sections, we just display the page again
+            print(traceback.print_exc())
+            return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=False, ts=False)
 
 def get_trade_list():
     qe = QueryEngine(db_filename)

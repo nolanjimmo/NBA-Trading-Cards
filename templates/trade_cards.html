@@ -19,6 +19,7 @@
             <p>You have no pending trades!</p>
         {%endif%}
         {%for trade in t_list%}
+        <div class="trade">
             <h3>Trade ID: {{trade.id}}</h3>
             <p>Between {{qe.get_user_from_id(trade.user1_id).name}} and {{qe.get_user_from_id(trade.user2_id).name}}</p>
             <p> {{qe.get_user_from_id(trade.user1_id).name}} Players: 
@@ -31,13 +32,27 @@
             {%endfor%}
             </p>
             {%if c_user.id == trade.user2_id:%}
-            <p>Trade ID for trade to complete:</p>
+            {%endif%}
+        </div>
+        {%endfor%}
+        <p>Trade ID for trade to complete:</p>
             <form action="/trade_cards" method="POST">
                 <input type="text" name="trade_id"></input>
                 <input type="submit"></input>
             </form>
-            {%endif%}
-        {%endfor%}
+        <br>
+        <h2>If you would like to propose a trade:<br> Enter the other users name, the and the players
+            you would like to trade
+        </h2>
+        <form action="/trade_cards" method="POST">
+            <label for="other_user">Other User's Username</label>
+            <input type="text" name="other_user">
+            <label for="u1_player">Player to give</label>
+            <input type="text" name="u1_player">
+            <label for="u2_player">Player to get</label>
+            <input type="text" name="u2_player">
+            <input type="submit">
+        </form>
 
         <button><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
         <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>

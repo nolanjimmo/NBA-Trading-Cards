@@ -37,3 +37,9 @@ ul{
 li:nth-child(even){
     background:lightblue;
 }
+
+.trade {
+    display: inline-block;
+    margin: 2%;
+    width: auto; 
+}

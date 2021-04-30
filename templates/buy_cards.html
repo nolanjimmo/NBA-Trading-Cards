@@ -25,10 +25,13 @@
         {%if u_cards|length > 0 %}
             <h2>Here are the cards in your inventory:</h2>
             {%for card in u_cards%}
-                <p>{{card.name}}</p>
+                <h4>{{card.name}}, {{card.pos}}</h4> <p>Shooting %: {{card.shooting_pct|round(2)}} &ensp;
+                    PPG: {{card.ppointspg}} &ensp; Rebounds PG: {{card.reboundspg}} &ensp;
+                    Assists PG: {{card.assistspg}}
+                </p>
             {%endfor%}
         {%endif%}
-
+        <br>
         <form action="/buying_cards" method="POST">
             <label for="add">Add Player</label>
             <input type="text" name="add"></input>
@@ -41,7 +44,7 @@
         <h2>Here are the cards that we have available:</h2>
         <ul>
             {%for card in all_cards%}
-                <li>{{card.name}}</li>
+                <li>{{card.name}}, {{card.pos}}</li>
             {%endfor%}
         </ul>
 
