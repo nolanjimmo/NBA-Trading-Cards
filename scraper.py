@@ -10,8 +10,7 @@ results = soup.find(id='totals_stats')
 
 players = results.find_all('tr', class_='full_table')
 
-f = open("players_pic.csv", "w")
-
+names = []
 for p in players:
     link = p.find('a')['href']
     link = link[:-4] + "jpg"
@@ -40,14 +39,20 @@ for p in players:
     name = name.replace('Š', 'S')
     name = name.replace('ý', 'y')
 
-    print(name)
-    f.write(name + "," + "https://www.basketball-reference.com/req/202104203/images" + link + "\n")
+    # print(name)
+    # f.write(name + "," + "https://www.basketball-reference.com/req/202104203/images" + link + "\n")
 
-    # with open('NBAdata.csv', newline='') as csvfile:
-    #     csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-    #     for row in csvreader:
-    #         if name == row[0]:
-    #             # print(row[0])
-    #             f.write(name + "," + "https://www.basketball-reference.com/req/202104203/images" + link + "\n")
+    with open('NBAdata.csv', newline='') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in csvreader:
+            if name == row[0]:
+                names.append(name + ",https://www.basketball-reference.com/req/202104203/images" + link)
+                # names.append("https://www.basketball-reference.com/req/202104203/images" + link)
+                # print(row[0])
+                # f.write(name + "," + "https://www.basketball-reference.com/req/202104203/images" + link + "\n")
 
+f = open("players_pic.csv", "w")
+names = sorted(names)
+for name in names:
+    f.write(name + "\n")
 f.close()
