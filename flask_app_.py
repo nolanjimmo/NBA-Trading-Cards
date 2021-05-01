@@ -7,6 +7,8 @@ import traceback
 
 from flask import Flask, flash, render_template, request, redirect, url_for
 from query_engine import *
+import login_helper as dc
+import login_db as db
 
 db_filename = "trading_card_data.db"
 schema_filename = "trading_card_schema.sql"
@@ -35,44 +37,110 @@ def about():
     return render_template("about_us.html")
 
 
-@app.route("/sign_in", methods=['POST','GET'])
+# @app.route("/sign_in", methods=['POST','GET'])
+# def sign_in():
+#     qe = QueryEngine(db_filename)
+#     global username
+#     global curr_user
+#     valid_user = None
+#     try:
+#         username = request.form['username']
+#     except:
+#         return render_template("main_page.html", u_name=None)
+#     #here, we query the database for the username
+#     try:
+#         curr_user = qe.get_user_from_username(username)
+#         return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+#     except:
+#         valid_user = False
+#         return render_template("main_page.html", u_name=username, valid_user=valid_user)
+
+
+@app.route("/sign_in", methods=['POST', 'GET'])
 def sign_in():
+    """
+    Login page method, calls login_helper.py and login_db.py functions
+    """
+    global username
+    global curr_user
+    qe = QueryEngine(db_filename)
+    valid_user = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        search_results = db.search_pass(username)
+        if search_results == -1:
+            flash('User does not exist', 'alert-danger')
+            return render_template('sign_up.html',
+                                   title="Secure Login",
+                                   heading="Secure Login")
+        else:
+            if dc.authenticate(search_results, password):
+                try:
+                    curr_user = qe.get_user_from_username(username)
+                    valid_user = True
+                    return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+                except:
+                    valid_user = False
+                    return render_template("main_page.html", u_name=username, valid_user=valid_user)
+            else:
+                flash('Incorrect login', 'alert-danger')
+                return render_template('sign_up.html',
+                                           title="Secure Login",
+                                           heading="Secure Login")
+
+    return render_template('sign_up.html',
+                           title="Secure Login",
+                           heading="Secure Login")
+
+
+# @app.route("/sign_up", methods=['POST'])
+# def sign_up():
+#     qe = QueryEngine(db_filename)
+#     global username
+#     global curr_user
+#     valid_user = None
+#     user_exists = False
+#     username = request.form['username']
+#     password = request.form.get('password')
+#
+#     if not qe.does_user_exist(username):
+#         qe.add_user(username, [], [])
+#     else:
+#         user_exists = True
+#
+#     if not user_exists:
+#         curr_user = qe.get_user_from_username(username)
+#         return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+#     else:
+#         return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
+
+
+@app.route("/sign_up", methods=['GET', 'POST'])
+def register():
     qe = QueryEngine(db_filename)
     global username
     global curr_user
     valid_user = None
-    try:
-        username = request.form['username']
-    except:
-        return render_template("main_page.html", u_name=None)
-    #here, we query the database for the username
-    try:
-        curr_user = qe.get_user_from_username(username)
-        return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
-    except:
-        valid_user = False
-        return render_template("main_page.html", u_name=username, valid_user=valid_user)
-
-
-@app.route("/sign_up", methods=['POST'])
-def sign_up():
-    qe = QueryEngine(db_filename)
-    global username
-    global curr_user
-    valid_user = None
-    user_exists = False
-    username = request.form['username']
-
-    if not qe.does_user_exist(username):
-        qe.add_user(username, [], [])
-    else:
-        user_exists = True
-
-    if not user_exists:
-        curr_user = qe.get_user_from_username(username)
-        return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
-    else:
-        return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if dc.is_good_user(username):
+            if dc.is_good_pass(password):
+                if db.register_user(username, password, 1) != -1:
+                    flash("Successfully created user", 'alert-success')
+                    if not qe.does_user_exist(username):
+                        qe.add_user(username, [], [])
+                    try:
+                        curr_user = qe.get_user_from_username(username)
+                        return render_template("successful_sign_in.html", u_name=username, valid_user=valid_user)
+                    except KeyError:
+                        pass
+                else:
+                    flash("Username is already in use", 'alert-danger')
+            else:
+                flash('Password does not meet the requirements', 'alert-danger')
+    return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 
 @app.route("/successful_sign_in", methods=['POST','GET'])

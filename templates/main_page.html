@@ -12,8 +12,10 @@
         {%endif%}
         <form action="/sign_in" method="POST" class="form" id="signin">
             <p>Sign in</p>
+            <p>Reminder: Password are 8-25 characters and have two numbers.</p>
             <label for="username">Username</label>
             <input type="text" name="username"></input>
+            <input type="password" name="password"></input>
             <input type="submit" value="Sign In"></input>
         </form>
         {%if valid_user == False%}
@@ -22,9 +24,11 @@
 
         <form action="/sign_up" method="POST" class="form" id="signup">
             <p>Register </p>
+            <p>Password must be 8-25 characters long and have two numbers.</p>
             <label for="username">Username</label>
-            <input type="text" name="username">
-            <input type="submit" value="Register">
+            <input type="text" name="username"></input>
+            <input type="password" name="password"></input>
+            <input type="submit" value="Register"></input>
         </form>
         {%if user_exists == True%}
             <p>User already exists</p>
