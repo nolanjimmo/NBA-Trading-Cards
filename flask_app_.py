@@ -133,7 +133,7 @@ def register():
             if dc.is_good_pass(password):
                 if db.register_user(username, password, 1) != -1:
                     flash("Successfully created user", 'alert-success')
-                    if not qe.does_user_exist(username):
+                    if not qe.check_user_exists(username):
                         qe.add_user(username, [], [])
                     try:
                         curr_user = qe.get_user_from_username(username)
