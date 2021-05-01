@@ -90,7 +90,7 @@ def sign_in():
                                        heading="Secure Login")
 
     elif request.method == 'GET':
-        render_template('main_page.html',
+        return render_template('main_page.html',
                         u_name=username,
                         valid_user=valid_user)
     return render_template('sign_up.html',
