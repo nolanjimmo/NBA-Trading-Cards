@@ -140,7 +140,7 @@ def register():
                     flash("Username is already in use", 'alert-danger')
             else:
                 flash('Password does not meet the requirements', 'alert-danger')
-    return render_template("main_page.html", u_name=username, valid_user=valid_user, user_exists=user_exists)
+    return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 
 @app.route("/successful_sign_in", methods=['POST','GET'])
