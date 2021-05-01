@@ -186,7 +186,7 @@ def trade_interface():
             return render_template("successful_sign_in.html", u_name = username, valid_user = True)
         except:
             #if there is nothing in either input sections, we just display the page again
-            print(traceback.print_exc())
+            #print(traceback.print_exc())
             return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=False, ts=False)
 
 def get_trade_list():
