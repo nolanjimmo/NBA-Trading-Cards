@@ -2,8 +2,6 @@
 Do a little setup!
 """
 
-import os
-
 from login_db import create_db
 
 
