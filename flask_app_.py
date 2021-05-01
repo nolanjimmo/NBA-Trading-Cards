@@ -1,7 +1,7 @@
-##CS205 Final Project 
-##Charles Morgan, Nolan Jimmo, Dean Stuart, George Fafard
+# CS205 Final Project
+# Charles Morgan, Nolan Jimmo, Dean Stuart, George Fafard
 
-##Beginning of the flask app for the interface of the project
+# Beginning of the flask app for the interface of the project
 
 import traceback
 
@@ -16,7 +16,7 @@ schema_filename = "trading_card_schema.sql"
 if os.path.exists(db_filename):
     os.remove(db_filename)
 load_database(db_filename, schema_filename)
-###Test data for the database
+# Test data for the database
 qe = QueryEngine(db_filename)
 load_test_data(qe)
 
@@ -86,8 +86,8 @@ def sign_in():
             else:
                 flash('Incorrect login', 'alert-danger')
                 return render_template('sign_up.html',
-                                           title="Secure Login",
-                                           heading="Secure Login")
+                                       title="Secure Login",
+                                       heading="Secure Login")
 
     return render_template('sign_up.html',
                            title="Secure Login",
@@ -143,10 +143,11 @@ def register():
     return render_template("main_page.html", u_name=username, valid_user=valid_user)
 
 
-@app.route("/successful_sign_in", methods=['POST','GET'])
+@app.route("/successful_sign_in", methods=['POST', 'GET'])
 def successful_sign_in():
     global username
     return render_template("successful_sign_in.html", u_name=username, valid_user=True)
+
 
 @app.route("/selection", methods=['POST'])
 def decision():
@@ -161,20 +162,21 @@ def decision():
         return render_template("display_cards.html", c_list=card_list, length=len(card_list))
 
     elif choice == "buy":
-        #all_cards = qe.get_all_cards()
+        # all_cards = qe.get_all_cards()
         # allow the user to look at all cards available
-        #return render_template("buy_cards.html", all_cards=all_cards, qe=qe)
+        # return render_template("buy_cards.html", all_cards=all_cards, qe=qe)
         return redirect(url_for("buying_cards"))
     else:
-        #trade_list=[]
-        #Here, we are going to display the list of trades the user is currently involved in
-        #for trade in curr_user.trades:
-            #trade_list.append(qe.get_trade_from_id(trade))
-        #display the trading interface
-        #return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user)
+        # trade_list=[]
+        # Here, we are going to display the list of trades the user is currently involved in
+        # for trade in curr_user.trades:
+        # trade_list.append(qe.get_trade_from_id(trade))
+        # display the trading interface
+        # return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user)
         return redirect(url_for("trade_interface"))
 
-@app.route("/buying_cards", methods=['POST','GET'])
+
+@app.route("/buying_cards", methods=['POST', 'GET'])
 def buying_cards():
     global curr_user
     qe = QueryEngine(db_filename)
@@ -191,9 +193,9 @@ def buying_cards():
                 rm_success = remove_card(drop_player)
             except:
                 print("input was bad")
-                #print(traceback.print_exc())
+                # print(traceback.print_exc())
                 return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
-        if rm_success != False:
+        if rm_success:
             add_new_card(add_player)
         else:
             print("here")
@@ -201,16 +203,18 @@ def buying_cards():
             return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
         user_cards = qe.get_user_cards(curr_user.id)
         all_cards = qe.get_all_cards()
-        return render_template("successful_sign_in.html", u_name = username, valid_user = True)
-        #return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+        return render_template("successful_sign_in.html", u_name=username, valid_user=True)
+        # return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
     except:
-        #print(traceback.print_exc())
+        # print(traceback.print_exc())
         return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+
 
 def add_new_card(card_name):
     qe = QueryEngine(db_filename)
     new_card = qe.get_card_from_name(card_name)
     qe.add_card_to_user(curr_user.id, new_card.id)
+
 
 def remove_card(card_name) -> bool:
     qe = QueryEngine(db_filename)
@@ -224,7 +228,8 @@ def remove_card(card_name) -> bool:
             return True
     return False
 
-@app.route("/trade_cards", methods=['POST','GET'])
+
+@app.route("/trade_cards", methods=['POST', 'GET'])
 def trade_interface():
     global curr_user
 
@@ -233,38 +238,38 @@ def trade_interface():
     trade_list = get_trade_list()
     trade_success = False
 
-    try: 
+    try:
         trade_id = int(request.form['trade_id'])
         if trade_id in curr_user.trades:
             trade_success = qe.do_trade(trade_id)
-        #print(trade_success)
-        if trade_success == True:
-            return render_template("successful_sign_in.html", u_name = username, valid_user = True)
+        # print(trade_success)
+        if trade_success:
+            return render_template("successful_sign_in.html", u_name=username, valid_user=True)
         else:
             return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=True, ts=False)
     except:
-        #print(traceback.print_exc())
+        # print(traceback.print_exc())
         try:
-            #here, we see if there is any input in the propose trade area
+            # here, we see if there is any input in the propose trade area
             other_user = request.form['other_user']
             u1_player = request.form['u1_player']
             u2_player = request.form['u2_player']
-            qe.create_trade(curr_user.id, [qe.get_card_from_name(u1_player).id], 
-                    qe.get_user_from_username(other_user).id,[qe.get_card_from_name(u2_player).id])
-            return render_template("successful_sign_in.html", u_name = username, valid_user = True)
+            qe.create_trade(curr_user.id, [qe.get_card_from_name(u1_player).id],
+                            qe.get_user_from_username(other_user).id, [qe.get_card_from_name(u2_player).id])
+            return render_template("successful_sign_in.html", u_name=username, valid_user=True)
         except:
-            #if there is nothing in either input sections, we just display the page again
+            # if there is nothing in either input sections, we just display the page again
             print(traceback.print_exc())
             return render_template("trade_cards.html", t_list=trade_list, qe=qe, c_user=curr_user, rft=False, ts=False)
 
+
 def get_trade_list():
     qe = QueryEngine(db_filename)
-    trade_list=[]
-        #Build the list of trades the user is involved in
+    trade_list = []
+    # Build the list of trades the user is involved in
     for trade in curr_user.trades:
         trade_list.append(qe.get_trade_from_id(trade))
     return trade_list
-            
 
 
 if __name__ == "__main__":

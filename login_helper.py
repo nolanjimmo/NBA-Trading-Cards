@@ -19,7 +19,6 @@ MAX_LEN = 25
 SALT_LEN = 40
 
 
-
 def is_good_user(strin):
     """
     Checks if the username does not have white space
