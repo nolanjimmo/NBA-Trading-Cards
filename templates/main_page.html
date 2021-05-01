@@ -5,8 +5,8 @@
     <title>Home Page</title>
 </head>
     <body id="main">
-        <h1> This is the home page!</h1>
-        <h2> Sign in to access your card trading system!</h2>
+        <h1 class="center_text"> This is the home page!</h1>
+        <h2 class="center_text"> Sign in to access your card trading system!</h2>
         {%if valid_user == False%}
             <p>Please try again</p>
         {%endif%}
@@ -33,6 +33,6 @@
         {%if user_exists == True%}
             <p>User already exists</p>
         {%endif%}
-        <button><a href="{{ url_for('about') }}">About</a></button>
+        <button class="center_button"><a href="{{ url_for('about') }}">About</a></button>
     </body>
 </html>

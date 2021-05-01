@@ -5,10 +5,10 @@
     <title>Buy Page</title>
 </head>
     <body>
-        <h1> This is the card purchasing page!</h1>
-        <h2>Any cards that are available for selection will be displayed here</h2>
-        <h3>If you already have 5 players, you will need to select a player to drop</h3>
-        <h3>If not, you will be able to add any player on the list</h3>
+        <h1 class="center_text"> This is the card purchasing page!</h1>
+        <h2 class="center_text">Any cards that are available for selection will be displayed here</h2>
+        <h3 class="center_text">If you already have 5 players, you will need to select a player to drop</h3>
+        <h3 class="center_text">If not, you will be able to add any player on the list</h3>
         {% block content%}
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -23,16 +23,16 @@
         {%endif%}
 
         {%if u_cards|length > 0 %}
-            <h2>Here are the cards in your inventory:</h2>
+            <h2 class="center_text">Here are the cards in your inventory:</h2>
             {%for card in u_cards%}
-                <h4>{{card.name}}, {{card.pos}}</h4> <p>Shooting %: {{card.shooting_pct|round(2)}} &ensp;
-                    PPG: {{card.ppointspg}} &ensp; Rebounds PG: {{card.reboundspg}} &ensp;
-                    Assists PG: {{card.assistspg}}
-                </p>
+            <p class="card"><b>{{card.name}}</b>, {{card.pos}} <br><br> Shooting %: {{card.shooting_pct}} <br>  
+                PPG: {{card.ppointspg}}  <br>  Rebounds PG: {{card.reboundspg}}   <br>
+                Assists PG: {{card.assistspg}}
+            </p>
             {%endfor%}
         {%endif%}
         <br>
-        <form action="/buying_cards" method="POST">
+        <form action="/buying_cards" method="POST" class="center_text">
             <label for="add">Add Player</label>
             <input type="text" name="add"></input>
             <label for="drop">Drop Player</label>
@@ -41,14 +41,15 @@
         </form>
 
         <br>
-        <h2>Here are the cards that we have available:</h2>
+        <h2 class="center_text">Here are the cards that we have available:</h2>
+        <div class="center_text">
         <ul>
             {%for card in all_cards%}
                 <li>{{card.name}}, {{card.pos}}</li>
             {%endfor%}
         </ul>
-
-        <button><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
-        <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
+        </div>
+        <button class="center_buttons"><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
+        <button class="center_buttons"><a href="{{ url_for('sign_in') }}">Sign In</a></button>
     </body>
 </html>

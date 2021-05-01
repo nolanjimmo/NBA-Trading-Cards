@@ -5,22 +5,22 @@
     <title>Display Page</title>
 </head>
     <body>
-    <h1> This is the card display page!</h1>
+    <h1 class="center_text"> This is the card display page!</h1>
         {%if length == 0 %}
             <p>You have no cards</p>
         {%endif%}
 
         {%if length > 0 %}
-            <h2>Here are the cards in your inventory:</h2>
+            <h2 class="center_text">Here are the cards in your inventory:</h2>
             {%for card in c_list%}
-            <p><b>{{card.name}}</b>, {{card.pos}} <br> Shooting %: {{card.shooting_pct}}  
-                    PPG: {{card.ppointspg}}    Rebounds PG: {{card.reboundspg}}   
+            <p class="card"><b>{{card.name}}</b>, {{card.pos}} <br><br> Shooting %: {{card.shooting_pct}} <br>  
+                    PPG: {{card.ppointspg}}  <br>  Rebounds PG: {{card.reboundspg}}   <br>
                     Assists PG: {{card.assistspg}}
                 </p>
             {%endfor%}
         {%endif%}
-
-        <button><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
-        <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
+        <br><br>
+        <button class="center_buttons"><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
+        <button class="center_buttons"><a href="{{ url_for('sign_in') }}">Sign In</a></button>
     </body>
 </html>

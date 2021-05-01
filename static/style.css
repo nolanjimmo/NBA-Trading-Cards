@@ -8,7 +8,8 @@ body {
 
 .form {
     background: dodgerblue;
-    margin: 0em 1em 1em 0em;
+    margin-left: 8%;
+    margin-right: 8%;
     border-radius: .5em .5em .5em .5em;
     padding: 0em .5em .5em .5em;
     border: 3px solid black;
@@ -19,8 +20,8 @@ body {
     border: 3px solid red;
 }
 
-#main button {
-    display: block;
+#successful_sign_in input{
+    display: inline-block;
 }
 
 ul{
@@ -32,14 +33,41 @@ ul{
     overflow:auto;
     padding:0;
     text-indent:10px;
+    margin: 0 auto;
 }
 
 li:nth-child(even){
-    background:lightblue;
+    background:dodgerblue;
 }
 
 .trade {
     display: inline-block;
     margin: 2%;
     width: auto; 
+}
+
+.card {
+    display: inline-block;
+    margin: 2%;
+    padding: 2%;
+    width: auto;
+    outline-style: solid;
+    outline-color: red;
+    background-color: lightskyblue;
+}
+
+.center_text{
+    text-align: center;
+}
+
+.center_buttons{
+    margin-left: 27%;
+    width: 10%;
+    padding: 2%;
+}
+
+.center_button{
+    margin-left: 45%;
+    width: 10%;
+    padding: 2%;
 }

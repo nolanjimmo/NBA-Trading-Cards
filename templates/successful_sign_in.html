@@ -1,12 +1,13 @@
 <!doctype html>
 <html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <head>
     <title>Successful Sign In</title>
 </head>
     <body>
-        <h1>Welcome {{u_name}}! This is your dashboard</h1>
-        <h1> Make a selection for what you want to do</h1>
-        <form action="/selection" method="POST">
+        <h1 class="center_text">Welcome {{u_name}}! This is your dashboard</h1>
+        <h1 class="center_text"> Make a selection for what you want to do</h1>
+        <form action="/selection" method="POST"class="center_text">
             <input type="radio" id="display" name="selection" value="display">
             <label for="display">Display</label><br>
             <input type="radio" id="buy" name="selection" value="buy">
@@ -16,6 +17,6 @@
             <input type="submit">
         </form>
         <br>
-        <button><a href="{{ url_for('home') }}">Home</a></button>
+        <button class="center_button"><a href="{{ url_for('home') }}">Home</a></button>
     </body>
 </html>

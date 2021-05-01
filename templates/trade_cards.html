@@ -6,8 +6,8 @@
     <title>Trade Page</title>
 </head>
     <body>
-        <h1>This is the card display page for {{c_user.name}}!</h1>
-        <h2>Here is the list of trades you are involved in right now:</h2>
+        <h1 class="center_text">This is the card display page for {{c_user.name}}!</h1>
+        <h2 class="center_text">Here is the list of trades you are involved in right now:</h2>
         {%if rft%}
             {%if ts%}
                 <p>Your last trade was successful! It should no longer appear in your list of trades</p>
@@ -35,16 +35,16 @@
             {%endif%}
         </div>
         {%endfor%}
-        <p>Trade ID for trade to complete:</p>
-            <form action="/trade_cards" method="POST">
+        <p class="center_text">Trade ID for trade to complete:</p>
+            <form action="/trade_cards" method="POST" class="center_text">
                 <input type="text" name="trade_id"></input>
                 <input type="submit"></input>
             </form>
         <br>
-        <h2>If you would like to propose a trade:<br> Enter the other users name, the and the players
+        <h2 class="center_text">If you would like to propose a trade:<br> Enter the other users name, the and the players
             you would like to trade
         </h2>
-        <form action="/trade_cards" method="POST">
+        <form action="/trade_cards" method="POST" class="center_text">
             <label for="other_user">Other User's Username</label>
             <input type="text" name="other_user">
             <label for="u1_player">Player to give</label>
@@ -54,7 +54,7 @@
             <input type="submit">
         </form>
 
-        <button><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
-        <button><a href="{{ url_for('sign_in') }}">Sign In</a></button>
+        <button class="center_buttons"><a href="{{ url_for('successful_sign_in') }}">Home</a></button>
+        <button class="center_buttons"><a href="{{ url_for('sign_in') }}">Sign In</a></button>
     </body>
 </html>
