@@ -25,8 +25,8 @@ def create_db():
         return False
     finally:
         date = get_date()
-        hashed_pw = hash_pw('Access2test!')
-        data_to_insert = [('access2test', hashed_pw, 2, date)]
+        hashed_pw = hash_pw('test1234')
+        data_to_insert = [('chuck', hashed_pw, 2, date)]
         try:
             c.executemany("INSERT INTO users VALUES (?, ?, ?, ?)", data_to_insert)
             conn.commit()
@@ -35,8 +35,29 @@ def create_db():
         else:
             print("Success")
         date = get_date()
-        hashed_pw = hash_pw('Access3test!')
-        data_to_insert = [('access3test', hashed_pw, 3, date)]
+        hashed_pw = hash_pw('test1234')
+        data_to_insert = [('nolan', hashed_pw, 3, date)]
+        try:
+            c.executemany("INSERT INTO users VALUES (?, ?, ?, ?)", data_to_insert)
+            conn.commit()
+        except sqlite3.IntegrityError:
+            print("Error. Tried to add duplicate record!")
+        else:
+            print("Success")
+
+        date = get_date()
+        hashed_pw = hash_pw('test1234')
+        data_to_insert = [('george', hashed_pw, 3, date)]
+        try:
+            c.executemany("INSERT INTO users VALUES (?, ?, ?, ?)", data_to_insert)
+            conn.commit()
+        except sqlite3.IntegrityError:
+            print("Error. Tried to add duplicate record!")
+        else:
+            print("Success")
+        date = get_date()
+        hashed_pw = hash_pw('test1234')
+        data_to_insert = [('dean', hashed_pw, 3, date)]
         try:
             c.executemany("INSERT INTO users VALUES (?, ?, ?, ?)", data_to_insert)
             conn.commit()
