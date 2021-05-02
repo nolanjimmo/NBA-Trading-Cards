@@ -40,6 +40,10 @@ li:nth-child(even){
     background:dodgerblue;
 }
 
+img{
+    display: block;
+}
+
 .trade {
     display: inline-block;
     margin: 2%;
