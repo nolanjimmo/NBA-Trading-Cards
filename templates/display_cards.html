@@ -13,7 +13,7 @@
         {%if length > 0 %}
             <h2 class="center_text">Here are the cards in your inventory:</h2>
             {%for card in c_list%}
-            <p class="card"><img src="{{card.image}}"><b>{{card.name}}</b>, {{card.pos}} <br><br> Shooting %: {{card.shooting_pct}} <br>
+            <p class="card"><img src="{{card.image}}"><b>{{card.name}}</b>, {{card.pos}}<br><br> Shooting %: {{card.shooting_pct}} <br>
                     PPG: {{card.ppointspg}}  <br>  Rebounds PG: {{card.reboundspg}}   <br>
                     Assists PG: {{card.assistspg}}
                 </p>
