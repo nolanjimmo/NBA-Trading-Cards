@@ -38,6 +38,7 @@ class Card:
     assistspg: int
     stealspg: int
     blockspg: int
+    image: int
 
     def __hash__(self):
         return hash((self.id,
@@ -58,12 +59,13 @@ class Card:
                      self.reboundspg,
                      self.assistspg,
                      self.stealspg,
-                     self.blockspg))
+                     self.blockspg,
+                     self.image))
 
 
 def create_card(
         card_data: Tuple[
-            int, str, str, str, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int]) -> Card:
+            int, str, str, str, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, str]) -> Card:
     return Card(
         card_data[0],
         card_data[1],
@@ -83,7 +85,8 @@ def create_card(
         card_data[15],
         card_data[16],
         card_data[17],
-        card_data[18])
+        card_data[18],
+        card_data[19])
 
 
 @dataclass
@@ -570,8 +573,8 @@ def load_database(db_loc: str, schema_loc: str) -> None:
             with open("NBAdata.csv", 'r') as cards_file:
                 cards = csv.DictReader(cards_file)
 
-                sql = """insert into Cards (name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg)
-                values (:NAME, :TEAM, :POS, :AGE, :GP, :MPG, :FTA, :FTpct, :2PA, :2Ppct, :3PA, :3Ppct, :SHOOTINGpct, :PPOINTSPG, :REBOUNDSPG, :ASSISTSPG, :STEALSPG, :BLOCKSPG)
+                sql = """insert into Cards (name, team, pos, age, gp, mpg, fta, ft_pct, two_pa, two_p_pct, three_pa, three_p_pct, shooting_pct, ppointspg, reboundspg, assistspg, stealspg, blockspg, image)
+                values (:NAME, :TEAM, :POS, :AGE, :GP, :MPG, :FTA, :FTpct, :2PA, :2Ppct, :3PA, :3Ppct, :SHOOTINGpct, :PPOINTSPG, :REBOUNDSPG, :ASSISTSPG, :STEALSPG, :BLOCKSPG, :IMAGE)
                 """
 
                 cursor = conn.cursor()

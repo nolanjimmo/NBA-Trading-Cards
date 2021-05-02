@@ -17,7 +17,8 @@ create table if not exists Cards (
     reboundspg real not null,
     assistspg real not null,
     stealspg real not null,
-    blockspg real not null
+    blockspg real not null,
+    image text not null
 );
 
 create table if not exists Users (
