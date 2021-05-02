@@ -199,12 +199,13 @@ def buying_cards():
                 print("input was bad")
                 # print(traceback.print_exc())
                 return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
-        if rm_success:
-            add_new_card(add_player)
-        else:
-            print("here")
-            flash("You can't add a player without dropping one")
-            return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+            if rm_success:
+                add_new_card(add_player)
+            else:
+                print("here")
+                flash("You can't add a player without dropping one")
+                return render_template("buy_cards.html", all_cards=all_cards, u_cards=user_cards, qe=qe)
+        add_new_card(add_player)
         user_cards = qe.get_user_cards(curr_user.id)
         all_cards = qe.get_all_cards()
         return render_template("successful_sign_in.html", u_name=username, valid_user=True)

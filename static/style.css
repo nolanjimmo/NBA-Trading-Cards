@@ -49,7 +49,7 @@ li:nth-child(even){
 .card {
     display: inline-block;
     margin: 1%;
-    padding: 2%;
+    padding: 1%;
     width: 15%;
     outline-style: solid;
     outline-color: red;
@@ -59,6 +59,7 @@ li:nth-child(even){
 .card img {
     margin: auto;
     display: block;
+    padding: 0 0 10% 0;
 }
 
 .center_text{
