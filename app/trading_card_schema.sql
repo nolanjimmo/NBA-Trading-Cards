@@ -1,5 +1,6 @@
 create table if not exists Cards (
     id integer primary key,
+    owned integer not null default 0,
     name text not null unique,
     team text not null,
     pos text not null,
@@ -24,6 +25,9 @@ create table if not exists Cards (
 create table if not exists Users (
     id integer primary key,
     name text not null unique,
+    hashed_pass text not null,
+    access text not null,
+    last_seen text not null,
     cards json,
     trades json
 );
@@ -32,6 +36,8 @@ create table if not exists Trades (
     id integer primary key,
     user1_id integer not null references Users,
     user1_cards json,
+    user1_confirmed integer not null default 0,
     user2_id integer not null references Users,
-    user2_cards json
+    user2_cards json,
+    user2_confirmed integer not null default 0
 );

@@ -1,0 +1,7 @@
+<figure>
+    <p>{{ card.name }}</p>
+    <form action="/view_card" method="POST">
+        <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
+        <input type="submit" value="View Card">
+    </form>
+</figure>

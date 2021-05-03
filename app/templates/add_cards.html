@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+
+    <h1>Add cards to your deck</h1>
+
+    <h3>Available cards:</h3>
+
+    {% for card in available_cards %}
+        {% include '_card.html' %}
+        <form action="/add_cards" method="POST">
+            <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
+            <input type="submit" value="Add Card">
+        </form>
+    {% endfor %}
+
+{% endblock %}

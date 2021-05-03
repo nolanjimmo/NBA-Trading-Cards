@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+    <form action="/choose_user" method="POST">
+        <label for="users">Choose a user to trade with:</label>
+        <select name="users" id="users">
+        {% for user in users %}
+            <option value="{{ user.name }}">{{ user.name }}</option>
+        {% endfor %}
+        </select>
+        <input type="submit" value="Select User">
+    </form>
+    {% if other_user is defined %}
+        <h1>Create trade with {{ other_user.name }}</h1>
+
+        <form action="/create_trade" method="POST">
+            <fieldset>
+                <legend>Select the cards you are offering</legend>
+                {% for card in own_cards %}
+                    <input type="checkbox" id="card_{{ card.id }}" name="own_cards" value="{{ card.id }}">
+                    <label for="card_{{ card.id }}">{{ card.name }}</label><br>
+                {% endfor %}
+            </fieldset>
+
+            <fieldset>
+                <legend>Select the cards you would like to receive</legend>
+                {% for card in other_cards %}
+                    <input type="checkbox" id="card_{{ card.id }}" name="other_cards" value="{{ card.id }}">
+                    <label for="card_{{ card.id }}">{{ card.name }}</label><br>
+                {% endfor %}
+            </fieldset>
+
+            <input type="hidden" id="other_user_id" name="other_user_id" value="{{ other_user.unique_id }}">
+
+            <input type="submit" value="Create Trade">
+        </form>
+    {% endif %}
+{% endblock %}

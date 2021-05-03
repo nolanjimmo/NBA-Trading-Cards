@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+    <h1>Sign Up</h1>
+
+    <form action="/sign_up" method="POST">
+        <p>Password must be between 8-25 characters long and have 2 numbers</p>
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <input type="submit" value="Sign Up">
+    </form>
+{% endblock %}

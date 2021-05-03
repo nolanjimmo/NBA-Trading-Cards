@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+    <h1>View Users</h1>
+    {% for user in users %}
+        {% include '_user.html' %}
+    {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    {% block title %}
+        {% if title %}
+            <title>{{ title }} - NBA Trading Card Game</title>
+        {% else %}
+            <title>NBA Trading Card Game</title>
+        {% endif %}
+    {% endblock %}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+    {% block header %}
+        <header>NBA Trading Card Game</header>
+    {% endblock %}
+
+    {% block navbar %}
+        <nav class="navbar">
+            <ul class="navbar-pages">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('add_cards') }}">Add Cards</a></li>
+                <li><a href="{{ url_for('create_trade') }}">Create Trade</a></li>
+                <li><a href="{{ url_for('view_users') }}">View Users</a></li>
+            </ul>
+            <ul class="navbar-util">
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('sign_up') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    {% endblock %}
+
+    {% block content %}
+        <section>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block page_content %}
+
+            {% endblock %}
+        </section>
+    {% endblock %}
+    </body>
+</html>
