@@ -82,7 +82,7 @@ def gen_pass():
     password = ''.join(password_list)
     return password
 
-salty = ""
+
 def hash_pw(plain_text) -> str:
     """
     given the plain texts hashes it in sha-256 and returns it
@@ -92,8 +92,6 @@ def hash_pw(plain_text) -> str:
     salt = os.urandom(SALT_LEN)
     salt = str(salt)
     salt = salt[:SALT_LEN]
-    global salty
-    salty = salt
     hashable = salt + plain_text  # concatenate salt and plain_text
     hashable = hashable.encode('utf-8')  # convert to bytes
     this_hash = hashlib.sha256(hashable).hexdigest()  # hash and hexdigest
