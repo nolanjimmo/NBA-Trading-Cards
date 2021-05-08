@@ -196,11 +196,45 @@ class QueryEngine:
         """
         Private method to initialize the database
         """
-        if not os.path.exists(db_filename):
+        db_exists = os.path.exists(db_filename)
+        if not db_exists:
             load_database()
         sqlite3.register_adapter(list, json_list_adapter)
         sqlite3.register_converter("json", json_list_converter)
         QueryEngine.initialized = True
+
+        if not db_exists:
+            QueryEngine.load_test_data()
+
+    @staticmethod
+    def load_test_data() -> None:
+        """
+        load test data
+        """
+        date = get_date()
+        hashed_pw = hash_pw('test1234')
+        QueryEngine.add_user("chuck", hashed_pw, 3, date)
+        user_id = QueryEngine.get_user_from_username("chuck").unique_id
+        for card_id in [1, 2, 3]:
+            QueryEngine.add_card_to_user(user_id, card_id)
+
+        QueryEngine.add_user("nolan", hashed_pw, 3, date)
+        user_id = QueryEngine.get_user_from_username("nolan").unique_id
+        for card_id in [4, 5, 6]:
+            QueryEngine.add_card_to_user(user_id, card_id)
+
+        QueryEngine.add_user("dean", hashed_pw, 3, date)
+        user_id = QueryEngine.get_user_from_username("dean").unique_id
+        for card_id in [7, 8, 9]:
+            QueryEngine.add_card_to_user(user_id, card_id)
+
+        QueryEngine.add_user("george", hashed_pw, 3, date)
+        user_id = QueryEngine.get_user_from_username("george").unique_id
+        for card_id in [10, 11, 12]:
+            QueryEngine.add_card_to_user(user_id, card_id)
+
+        QueryEngine.create_trade(1, [2], 2, [4])
+        QueryEngine.create_trade(3, [7, 8], 4, [10])
 
     @staticmethod
     def __get_connection() -> sqlite3.Connection:
@@ -890,30 +924,3 @@ def load_database() -> None:
                 cursor.close()
 
         conn.commit()
-
-
-def load_test_data() -> None:
-    date = get_date()
-    hashed_pw = hash_pw('test1234')
-    QueryEngine.add_user("chuck", hashed_pw, 3, date)
-    user_id = QueryEngine.get_user_from_username("chuck").unique_id
-    for card_id in [1, 2, 3]:
-        QueryEngine.add_card_to_user(user_id, card_id)
-
-    QueryEngine.add_user("nolan", hashed_pw, 3, date)
-    user_id = QueryEngine.get_user_from_username("nolan").unique_id
-    for card_id in [4, 5, 6]:
-        QueryEngine.add_card_to_user(user_id, card_id)
-
-    QueryEngine.add_user("dean", hashed_pw, 3, date)
-    user_id = QueryEngine.get_user_from_username("dean").unique_id
-    for card_id in [7, 8, 9]:
-        QueryEngine.add_card_to_user(user_id, card_id)
-
-    QueryEngine.add_user("george", hashed_pw, 3, date)
-    user_id = QueryEngine.get_user_from_username("george").unique_id
-    for card_id in [10, 11, 12]:
-        QueryEngine.add_card_to_user(user_id, card_id)
-
-    QueryEngine.create_trade(1, [2], 2, [4])
-    QueryEngine.create_trade(3, [7, 8], 4, [10])
