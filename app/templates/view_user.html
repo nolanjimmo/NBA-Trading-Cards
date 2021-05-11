@@ -1,18 +1,16 @@
 {% extends 'base.html' %}
 
 {% block page_content %}
-    <h1>{{ user.name }}</h1>
-    <h3>Cards:</h3>
-    <div>
-        {% for card in user_cards %}
-            {% include "_card.html" %}
-        {% endfor %}
-    </div>
+    <h1>Viewing user: {{ user.name }}</h1>
 
-    <h3>Trades:</h3>
-    <div>
-        {% for trade in user_trades %}
-            {% include "_trade.html" %}
-        {% endfor %}
-    </div>
+    <section>
+        <h2>User's Cards:</h2>
+        <div class="container">
+            {% for card in user_cards %}
+                <figure class="card">
+                    {% include "_card.html" %}
+                </figure>
+            {% endfor %}
+        </div>
+    </section>
 {% endblock %}

@@ -1,23 +1,28 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <h1>Dashboard for {{ current_user.name }}</h1>
+    <h1>Dashboard for user: {{ current_user.name }}</h1>
 
-    <h3>Your Cards (limit {{ num_user_cards }}/5 per user)</h3>
-    {% for card in user_cards %}
-        {% include '_own_card.html' %}
-    {% endfor %}
+    <section>
+        <h2>Your Cards (limit {{ num_user_cards }}/5 per user)</h2>
+        <form action="/add_cards" method="GET">
+            <input type="submit" value="Add Cards">
+        </form>
+        <div class="container">
+            {% for card in user_cards %}
+                {% include '_own_card.html' %}
+            {% endfor %}
+        </div>
 
-    <form action="/add_cards" method="GET">
-        <input type="submit" value="Add Cards">
-    </form>
+        <h2>Your Trades</h2>
+        <form action="/create_trade" method="GET">
+            <input type="submit" value="Create Trade">
+        </form>
+        <div class="container">
+            {% for trade in user_trades %}
+                {% include '_own_trade.html' %}
+            {% endfor %}
+        </div>
 
-    <h3>Your Trades</h3>
-    {% for trade in user_trades %}
-        {% include '_own_trade.html' %}
-    {% endfor %}
-    <form action="/create_trade" method="GET">
-        <input type="submit" value="Create Trade">
-    </form>
-
+    </section>
 {% endblock %}

@@ -1,4 +1,4 @@
-<figure>
+<figure class="trade">
     <p>Trade Id: {{ trade.unique_id }}</p>
     <form action="/view_trade" method="POST">
         <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">

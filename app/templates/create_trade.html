@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
 {% block page_content %}
+
+    {% if other_user is defined %}
+        <h1>Create new trade with {{ other_user.name }}</h1>
+    {% else %}
+        <h1>Create new trade</h1>
+    {% endif %}
     <form action="/choose_user" method="POST">
         <label for="users">Choose a user to trade with:</label>
         <select name="users" id="users">
@@ -11,8 +17,6 @@
         <input type="submit" value="Select User">
     </form>
     {% if other_user is defined %}
-        <h1>Create trade with {{ other_user.name }}</h1>
-
         <form action="/create_trade" method="POST">
             <fieldset>
                 <legend>Select the cards you are offering</legend>

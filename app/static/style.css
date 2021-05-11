@@ -14,19 +14,6 @@ header {
     box-shadow: 5px 10px 8px 10px #888888;
 }
 
-h2 {
-    border-bottom: 1px solid black
-}
-
-h3 {
-    padding-left: 1em;
-}
-
-main {
-    margin-top: 8em;
-    margin-left: 2em;
-}
-
 nav ul {
     list-style-type: none;
     margin: 0;
@@ -86,12 +73,13 @@ img{
 
 .card {
     display: inline-block;
-    margin: 1%;
-    padding: 1%;
-    width: 21%;
+    margin: 1em 0.1em 1em 0.1em;
+    padding: 1em;
+    width: 15em;
     outline-style: solid;
     outline-color: rgb(214, 32, 84);
     background-color: lightskyblue;
+    text-align: center;
 }
 
 .card img {
@@ -102,9 +90,42 @@ img{
 
 .center_text{
     text-align: center;
+
 }
 
 main {
     margin-top: 1em;
+}
+
+main h1 {
+    border-bottom: solid black 0.05em;
+    padding-left: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+section {
     margin-left: 2em;
+}
+
+.trade {
+    border: solid rgb(214, 32, 84) 0.15em;
+    margin-left: 0;
+    margin-right: 0.1em;
+    text-align: center;
+    display: inline-block;
+    padding: 0.5em;
+}
+
+.user {
+    border-bottom: solid black 0.1em;
+    padding-left: 1em;
+    padding-bottom: 1em;
+}
+
+.trade form, .card form, .user form {
+    margin-left: 0;
+}
+
+.container {
+    margin-left: 1.5em;
 }

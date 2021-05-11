@@ -4,10 +4,14 @@
 
     <h1>Add cards to your deck</h1>
 
-    <h3>Available cards:</h3>
+    <section>
+        <h2>Available cards:</h2>
 
-    {% for card in available_cards %}
-        {% include '_available_card.html' %}
-    {% endfor %}
+        <div class="container">
+            {% for card in available_cards %}
+                {% include '_available_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
 
 {% endblock %}

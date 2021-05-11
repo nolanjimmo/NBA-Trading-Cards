@@ -3,15 +3,17 @@
 {% block page_content %}
     <h1>Login</h1>
 
-    <form action="/login" method="POST">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br>
-        <input type="checkbox" id="remember_me" name="remember_me" value="remember_me">
-        <label for="remember_me">Remember Me</label><br>
-        <input type="submit" value="Login">
-    </form>
+    <section>
+        <form action="/login" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br>
+            <input type="checkbox" id="remember_me" name="remember_me" value="remember_me">
+            <label for="remember_me">Remember Me</label><br>
+            <input type="submit" value="Login">
+        </form>
 
-    <p><a href="{{ url_for('sign_up') }}">Click to Register!</a></p>
+        <p><a href="{{ url_for('sign_up') }}">Click to Register!</a></p>
+    </section>
 {% endblock %}

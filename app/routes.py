@@ -175,6 +175,7 @@ def delete_trade():
 @login_required
 def view_users():
     users = QueryEngine.get_all_users()
+    users.remove(current_user)
     return render_template("view_users.html", title="View Users", users=users)
 
 

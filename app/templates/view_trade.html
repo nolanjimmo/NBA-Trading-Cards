@@ -3,57 +3,59 @@
 {% block page_content %}
     <h1>View Trade: {{ trade.unique_id }}</h1>
 
-    {% if current_user.unique_id == user1.unique_id %}
-        {% if trade.user1_confirmed %}
-            <form action="/unconfirm_trade" method="POST">
-                <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
-                <input type="submit" value="Un-Confirm Trade">
-            </form>
+    <section>
+        {% if current_user.unique_id == user1.unique_id %}
+            {% if trade.user1_confirmed %}
+                <form action="/unconfirm_trade" method="POST">
+                    <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
+                    <input type="submit" value="Un-Confirm Trade">
+                </form>
+            {% else %}
+                <form action="/confirm_trade" method="POST">
+                    <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
+                    <input type="submit" value="Confirm Trade">
+                </form>
+            {% endif %}
         {% else %}
-            <form action="/confirm_trade" method="POST">
-                <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
-                <input type="submit" value="Confirm Trade">
-            </form>
+            {% if trade.user2_confirmed %}
+                <form action="/unconfirm_trade" method="POST">
+                    <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
+                    <input type="submit" value="Un-Confirm Trade">
+                </form>
+            {% else %}
+                <form action="/confirm_trade" method="POST">
+                    <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
+                    <input type="submit" value="Confirm Trade">
+                </form>
+            {% endif %}
         {% endif %}
-    {% else %}
-        {% if trade.user2_confirmed %}
-            <form action="/unconfirm_trade" method="POST">
-                <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
-                <input type="submit" value="Un-Confirm Trade">
-            </form>
-        {% else %}
-            <form action="/confirm_trade" method="POST">
-                <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
-                <input type="submit" value="Confirm Trade">
-            </form>
-        {% endif %}
-    {% endif %}
 
-    <form action="/delete_trade" method="POST">
-        <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
-        <input type="submit" value="Delete Trade">
-    </form>
+        <form action="/delete_trade" method="POST">
+            <input type="hidden" id="trade_id" name="trade_id" value="{{ trade.unique_id }}">
+            <input type="submit" value="Delete Trade">
+        </form>
 
-    <h3>{{ user1.name }}'s cards</h3>
-    {% for card in user1_cards %}
-        <div class="card">
-            {% include '_card.html' %}
-        </div>
-    {% endfor %}
+        <h3>{{ user1.name }}'s cards</h3>
+        {% for card in user1_cards %}
+            <div class="card">
+                {% include '_card.html' %}
+            </div>
+        {% endfor %}
 
-    <form>
-        <input type="checkbox" id="user1_confirmed" name="user1_confirmed" onclick="return false;" disabled="disabled" {% if trade.user1_confirmed %} checked {% endif %}>
-        <label for="user1_confirmed">Confirmed by {{ user1.name }}</label>
-    </form>
+        <form>
+            <input type="checkbox" id="user1_confirmed" name="user1_confirmed" onclick="return false;" disabled="disabled" {% if trade.user1_confirmed %} checked {% endif %}>
+            <label for="user1_confirmed">Confirmed by {{ user1.name }}</label>
+        </form>
 
-    <h3>{{ user2.name }}'s cards</h3>
-    {% for card in user2_cards %}
-        <div class="card">
-            {% include '_card.html' %}
-        </div>
-    {% endfor %}
-    <form>
-        <input type="checkbox" id="user2_confirmed" name="user2_confirmed" onclick="return false;" disabled="disabled" {% if trade.user2_confirmed %} checked {% endif %}>
-        <label for="user2_confirmed">Confirmed by {{ user2.name }}</label>
-    </form>
+        <h3>{{ user2.name }}'s cards</h3>
+        {% for card in user2_cards %}
+            <div class="card">
+                {% include '_card.html' %}
+            </div>
+        {% endfor %}
+        <form>
+            <input type="checkbox" id="user2_confirmed" name="user2_confirmed" onclick="return false;" disabled="disabled" {% if trade.user2_confirmed %} checked {% endif %}>
+            <label for="user2_confirmed">Confirmed by {{ user2.name }}</label>
+        </form>
+    </section>
 {% endblock %}

@@ -1,5 +1,5 @@
-<figure>
-    <p>{{ user.name }}</p>
+<figure class="user">
+    <p>User: {{ user.name }}</p>
     <form action="/view_user" method="POST">
         <input type="hidden" id="user_id" name="user_id" value="{{ user.unique_id }}">
         <input type="submit" value="View User">
