@@ -1,0 +1,7 @@
+<figure class="card">
+    {% include '_card.html' %}
+    <form action="/add_cards" method="POST">
+        <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
+        <input type="submit" value="Add Card">
+    </form>
+</figure>

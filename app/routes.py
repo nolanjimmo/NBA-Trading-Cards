@@ -9,7 +9,7 @@ from flask_login import current_user, login_user, login_required, logout_user
 
 from app import app
 from app import login_db as db, login_helper as dc
-from app.query_engine import QueryEngine, User, NoOutputError
+from app.query_engine import QueryEngine, User, NoOutputError, QueryEngineError
 
 current_user: User
 
@@ -36,7 +36,7 @@ def dashboard():
 @login_required
 def add_cards():
     if request.method == 'POST':
-        card_id = request.form.get('card_id')
+        card_id = int(request.form.get('card_id'))
         success: bool = QueryEngine.add_card_to_user(current_user.unique_id, card_id)
         if not success:
             flash("You need to remove a card from your deck before adding a new one!")
@@ -50,19 +50,10 @@ def add_cards():
 @login_required
 def remove_card():
     if request.method == 'POST':
-        card_id = request.form.get('card_id')
+        card_id = int(request.form.get('card_id'))
         if card_id in current_user.cards:
             QueryEngine.remove_card_from_user(current_user.unique_id, card_id)
         return redirect(url_for('dashboard'))
-
-
-@app.route("/view_card", methods=['GET', 'POST'])
-@login_required
-def view_card():
-    if request.method == 'POST':
-        card_id = request.form.get('card_id')
-        card = QueryEngine.get_card_from_id(card_id)
-        return render_template("view_card.html", title="View Card", card=card)
 
 
 @app.route("/create_trade", methods=['GET', 'POST'])
@@ -70,14 +61,19 @@ def view_card():
 def create_trade():
     if request.method == 'POST':
         own_card_ids = request.form.getlist('own_cards')
+        for i in range(len(own_card_ids)):
+            own_card_ids[i] = int(own_card_ids[i])
         other_card_ids = request.form.getlist('other_cards')
-        other_user_id = request.form.get('other_user_id')
-        if QueryEngine.create_trade(current_user.unique_id, own_card_ids, other_user_id, other_card_ids):
+        for i in range(len(other_card_ids)):
+            other_card_ids[i] = int(other_card_ids[i])
+        other_user_id = int(request.form.get('other_user_id'))
+        if QueryEngine.create_trade(current_user.unique_id, own_card_ids, int(other_user_id), other_card_ids):
             return redirect(url_for('dashboard'))
         else:
             flash("Failed to create trade")
             return redirect(url_for('create_trade'))
     users = QueryEngine.get_all_users()
+    users.remove(current_user)
     return render_template("create_trade.html", title="Create Trade", users=users)
 
 
@@ -98,7 +94,7 @@ def choose_user():
 @login_required
 def view_trade():
     if request.method == 'POST':
-        trade_id = request.form.get('trade_id')
+        trade_id = int(request.form.get('trade_id'))
         trade = QueryEngine.get_trade_from_id(trade_id)
         user1 = QueryEngine.get_user_from_id(trade.user1_id)
         user1_cards = []
@@ -116,13 +112,63 @@ def view_trade():
 @login_required
 def confirm_trade():
     if request.method == 'POST':
-        trade_id = request.form.get('trade_id')
+        trade_id = int(request.form.get('trade_id'))
         trade = QueryEngine.get_trade_from_id(trade_id)
         if QueryEngine.user_confirm_trade(current_user, trade):
-            return redirect(url_for('dashboard'))
+            try:
+                trade = QueryEngine.get_trade_from_id(trade_id)
+                user1 = QueryEngine.get_user_from_id(trade.user1_id)
+                user1_cards = []
+                for card_id in trade.user1_cards:
+                    user1_cards.append(QueryEngine.get_card_from_id(card_id))
+                user2 = QueryEngine.get_user_from_id(trade.user2_id)
+                user2_cards = []
+                for card_id in trade.user2_cards:
+                    user2_cards.append(QueryEngine.get_card_from_id(card_id))
+                return render_template("view_trade.html", title="View Trade", trade=trade, user1=user1,
+                                       user1_cards=user1_cards,
+                                       user2=user2, user2_cards=user2_cards)
+            except NoOutputError:
+                flash("Trade completed!")
+                return redirect(url_for('dashboard'))
         else:
             flash("You must drop enough players before you are able to confirm this trade")
             return redirect(url_for('dashboard'))
+
+
+@app.route("/unconfirm_trade", methods=['GET', 'POST'])
+@login_required
+def unconfirm_trade():
+    if request.method == 'POST':
+        trade_id = int(request.form.get('trade_id'))
+        trade = QueryEngine.get_trade_from_id(trade_id)
+        try:
+            QueryEngine.user_unconfirm_trade(current_user, trade)
+        except QueryEngineError as err:
+            flash(err)
+            return redirect(url_for('dashboard'))
+        else:
+            trade = QueryEngine.get_trade_from_id(trade_id)
+            user1 = QueryEngine.get_user_from_id(trade.user1_id)
+            user1_cards = []
+            for card_id in trade.user1_cards:
+                user1_cards.append(QueryEngine.get_card_from_id(card_id))
+            user2 = QueryEngine.get_user_from_id(trade.user2_id)
+            user2_cards = []
+            for card_id in trade.user2_cards:
+                user2_cards.append(QueryEngine.get_card_from_id(card_id))
+            return render_template("view_trade.html", title="View Trade", trade=trade, user1=user1,
+                                   user1_cards=user1_cards,
+                                   user2=user2, user2_cards=user2_cards)
+
+
+@app.route("/delete_trade", methods=['GET', 'POST'])
+@login_required
+def delete_trade():
+    if request.method == 'POST':
+        trade_id = int(request.form.get('trade_id'))
+        QueryEngine.delete_trade(int(trade_id))
+        return redirect(url_for('dashboard'))
 
 
 @app.route("/view_users", methods=['GET', 'POST'])
@@ -136,7 +182,7 @@ def view_users():
 @login_required
 def view_user():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
+        user_id = int(request.form.get('user_id'))
         user = QueryEngine.get_user_from_id(user_id)
         user_cards = QueryEngine.get_user_cards(user_id)
         user_trades = QueryEngine.get_user_trades(user_id)
@@ -151,7 +197,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        remember_me = request.form.get('remember_me')
+        remember_me = bool(request.form.get('remember_me'))
 
         search_results = db.search_pass(username)
         if search_results == -1:

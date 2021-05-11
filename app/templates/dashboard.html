@@ -5,10 +5,9 @@
 
     <h3>Your Cards (limit {{ num_user_cards }}/5 per user)</h3>
     {% for card in user_cards %}
-        <div>
-            {% include '_own_card.html' %}
-        </div>
+        {% include '_own_card.html' %}
     {% endfor %}
+
     <form action="/add_cards" method="GET">
         <input type="submit" value="Add Cards">
     </form>

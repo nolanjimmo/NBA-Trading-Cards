@@ -1,11 +1,7 @@
-<figure>
-    <p>{{ card.name }}</p>
-    <form action="/view_card" method="POST">
-        <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
-        <input type="submit" value="View Card">
-    </form>
-    <form action="/remove_card" method="POST">
-        <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
-        <input type="submit" value="Remove Card">
-    </form>
+<figure class="card">
+        {% include '_card.html' %}
+        <form action="/remove_card" method="POST">
+            <input type="hidden" id="card_id" name="card_id" value="{{ card.id }}">
+            <input type="submit" value="Remove Card">
+        </form>
 </figure>

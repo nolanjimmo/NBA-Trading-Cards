@@ -1,6 +1,7 @@
 """
 File to control the database
 """
+import datetime
 
 from app.login_helper import hash_pw, authenticate
 
@@ -15,7 +16,7 @@ def register_user(username, password, access):
     :param access:
     :return:
     """
-    date = get_date()
+    date = datetime.datetime.utcnow()
     hashed_pw = hash_pw(password)
     if QueryEngine.check_user_exists(username):
         return -1

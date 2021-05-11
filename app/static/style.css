@@ -1,62 +1,96 @@
-* {
-    font-family: Georgia, serif;
-}
-
 body {
-  background: #F8F8FF;
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.form {
-    background: dodgerblue;
-    margin-left: 6%;
-    margin-right: 6%;
-    border-radius: .5em .5em .5em .5em;
-    padding: 0em .5em .5em .5em;
-    border: 3px solid black;
-    display: inline-block;
+header {
+    background-color: rgb(1, 87, 155);
+    padding: .25em;
+    font-weight: bold;
+    font-size: 22px;
+    color: white;
+    text-shadow: -4px 2px rgba(0,0,0,.5);
+    box-shadow: 5px 10px 8px 10px #888888;
 }
 
-.form:hover {
-    border: 3px solid red;
+h2 {
+    border-bottom: 1px solid black
 }
 
-#successful_sign_in input{
-    display: inline-block;
+h3 {
+    padding-left: 1em;
 }
 
-ul{
-    background: white;
-    list-style:none;
-    max-height:300px;
-    max-width: 300px;
-    margin: 0 0 1em 1em;
-    overflow:auto;
-    padding:0;
-    text-indent:10px;
-    margin: 0 auto;
+main {
+    margin-top: 8em;
+    margin-left: 2em;
 }
 
-li:nth-child(even){
-    background:dodgerblue;
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: lightgray;
+    border-top: 1px solid black;
+}
+
+ul:nth-child(2) {
+    border-bottom: 1px solid black;
+}
+
+nav li {
+  float: left;
+}
+
+nav li a:hover {
+    background-color: white;
+}
+
+nav li a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px
+}
+
+.left {
+    float: left;
+    width: 100%;
+}
+
+.right {
+    float: right;
+    width: 100%;
+}
+
+form {
+    margin-left: 1em
+}
+
+.form-group {
+    margin-top: .5em;
+    margin-bottom: .6em;
+}
+
+.checkbox {
+    margin-bottom: .5em
 }
 
 img{
     display: block;
 }
 
-.trade {
-    display: inline-block;
-    margin: 2%;
-    width: auto; 
-}
-
 .card {
     display: inline-block;
     margin: 1%;
     padding: 1%;
-    width: 15%;
+    width: 21%;
     outline-style: solid;
-    outline-color: red;
+    outline-color: rgb(214, 32, 84);
     background-color: lightskyblue;
 }
 
@@ -70,14 +104,7 @@ img{
     text-align: center;
 }
 
-.center_buttons{
-    margin-left: 27%;
-    width: 10%;
-    padding: 2%;
-}
-
-.center_button{
-    margin-left: 45%;
-    width: 10%;
-    padding: 2%;
+main {
+    margin-top: 1em;
+    margin-left: 2em;
 }

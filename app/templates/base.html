@@ -13,7 +13,9 @@
     </head>
     <body>
     {% block header %}
-        <header>NBA Trading Card Game</header>
+        <header>
+            <h1><span style="color: rgb(214, 32, 84)">NBA</span>* Trading Card Game</h1>
+        </header>
     {% endblock %}
 
     {% block navbar %}
@@ -33,7 +35,7 @@
     {% endblock %}
 
     {% block content %}
-        <section>
+        <main>
             {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -45,7 +47,13 @@
             {% block page_content %}
 
             {% endblock %}
-        </section>
+        </main>
+    {% endblock %}
+
+    {% block footer %}
+        <footer>
+            <p>* not affiliated with the NBA in any way, shape, or form</p>
+        </footer>
     {% endblock %}
     </body>
 </html>

@@ -27,7 +27,7 @@ create table if not exists Users (
     name text not null unique,
     hashed_pass text not null,
     access text not null,
-    last_seen text not null,
+    last_seen timestamp not null,
     cards json,
     trades json
 );

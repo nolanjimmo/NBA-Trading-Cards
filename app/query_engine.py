@@ -11,7 +11,6 @@ from flask_login import UserMixin
 from app import login, db_filename, schema_filename, basedir
 from app.login_helper import hash_pw
 
-
 MAX_CARDS = 5
 
 
@@ -131,7 +130,7 @@ class User(UserMixin):
     name: str
     hashed_pass: str
     access: int
-    last_seen: str
+    last_seen: datetime
     cards: Set[int]
     trades: Set[int]
 
@@ -142,7 +141,7 @@ class User(UserMixin):
         return hash((self.unique_id, self.name, self.hashed_pass, self.access, self.last_seen))
 
 
-def create_user(user_data: Tuple[int, str, str, int, str, List[int], List[int]]) -> User:
+def create_user(user_data: Tuple[int, str, str, int, datetime, List[int], List[int]]) -> User:
     return User(user_data[0], user_data[1], user_data[2], user_data[3],
                 user_data[4], set(user_data[5]), set(user_data[6]))
 
@@ -211,7 +210,7 @@ class QueryEngine:
         """
         load test data
         """
-        date = get_date()
+        date = datetime.utcnow()
         hashed_pw = hash_pw('test1234')
         QueryEngine.add_user("chuck", hashed_pw, 3, date)
         user_id = QueryEngine.get_user_from_username("chuck").unique_id
@@ -533,7 +532,7 @@ class QueryEngine:
                 conn.commit()
 
     @staticmethod
-    def add_user(username: str, hashed_pass: str, access: int, last_seen: str) -> None:
+    def add_user(username: str, hashed_pass: str, access: int, last_seen: datetime) -> None:
         """
         Add a new User to the database with the given info
 
@@ -543,7 +542,7 @@ class QueryEngine:
         :param last_seen: the str format of the date the new User was last seen
         """
         query = "insert into Users (name, hashed_pass, access, last_seen, cards, trades) values (?, ?, ?, ?, ?, ?)"
-        data = username, hashed_pass, access, last_seen, list(), list()
+        data = str(username), str(hashed_pass), int(access), last_seen, list(), list()
         with QueryEngine.__get_connection() as conn:
             try:
                 conn.execute(query, data)
@@ -558,7 +557,7 @@ class QueryEngine:
         Internal method to add a new Trade without performing any checks, used by the public helper method/s
         """
         query = "insert into Trades (user1_id, user1_cards, user2_id, user2_cards) values (?, ?, ?, ?)"
-        data = user1_id, user1_cards, user2_id, user2_cards
+        data = int(user1_id), user1_cards, int(user2_id), user2_cards
 
         with QueryEngine.__get_connection() as conn:
             try:
@@ -732,10 +731,10 @@ class QueryEngine:
         :return: true if succeeds false if fails
         """
         if not QueryEngine.check_card_owned(card_id):
-            u: User = QueryEngine.get_user_from_id(user_id)
+            u: User = QueryEngine.get_user_from_id(int(user_id))
             if len(u.cards) < MAX_CARDS:
                 new_user_cards: List[int] = list(u.cards)
-                new_user_cards.append(card_id)
+                new_user_cards.append(int(card_id))
 
                 query = "update Users set cards = ? where id = ?"
 
@@ -760,8 +759,9 @@ class QueryEngine:
         :param user_id: the id of the User who the Card is being removed from
         :param card_id: the id of the Card
         """
-        user_cards: List[int] = list(QueryEngine.get_user_from_id(user_id).cards)
-        user_cards.remove(card_id)
+        user = QueryEngine.get_user_from_id(int(user_id))
+        user_cards: List[int] = list(user.cards)
+        user_cards.remove(int(card_id))
 
         query = "update Users set cards = ? where id = ?"
 
@@ -773,6 +773,10 @@ class QueryEngine:
             else:
                 conn.commit()
                 QueryEngine.set_card_not_owned(card_id)
+                for trade_id in user.trades:
+                    trade = QueryEngine.get_trade_from_id(trade_id)
+                    if int(card_id) in trade.user1_cards.union(trade.user2_cards):
+                        QueryEngine.delete_trade(trade_id)
 
     @staticmethod
     def user_unconfirm_trade(u: User, t: Trade):
@@ -802,6 +806,7 @@ class QueryEngine:
                 conn.rollback()
             else:
                 conn.commit()
+                return True
 
     @staticmethod
     def user_confirm_trade(u: User, t: Trade) -> bool:
